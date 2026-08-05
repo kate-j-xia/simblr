@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+    <head>
+        
+<!------------------------------------------------------------------------------
+                                                    
+
+
+
+
+
+
+                                    from @katnapse                                  
+
+
+                                
+                                        
+                                        
+
+
+------------------------------------------------------------------------------->    
+
+
+        <title>{Title}</title>
+        <link rel="alternate" type="application/rss+xml" href="{RSS}">
+        <link rel="shortcut icon" href="{Favicon}">
+        {block:Description}
+            <meta name="description" content="{MetaDescription}">
+        {/block:Description}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- scripts ------------------------------------------------------------------>
+
+        <link rel="stylesheet" href="add base link once merged">
+        <link rel="stylesheet" href="add dark-mode link once merged">
+        <script src="add js link once merged"></script>
+
+<!-- defaults ----------------------------------------------------------------->
+
+        <meta name="image:Right Sidebar Image" content="">
+        <meta name="if:Right Sidebar Image" content="">
+        <meta name="color:Link Hover" content="#f08dbd">
+        <meta name="select:Font Size" content="9px" title="9px">
+        <meta name="select:Font Size" content="10px" title="10px">
+        <meta name="select:Font Size" content="11px" title="11px">
+        <meta name="select:Font Size" content="12px" title="12px">
+        <meta name="if:Dark Default" content="">
+        <meta name="if:Show Avatar" content="">
+        <meta name="if:Show Captions" content="">
+        <meta name="if:Show Tags" content="">
+        <meta name="if:Infinite Scroll" content="">
+        <meta name="text:Posts" content="500px">
+        <meta name="text:Home Link" content="">
+        <meta name="text:Archive Link" content="">
+        <meta name="text:Ask Link" content="contact">
+        <meta name="text:Link 1" content="">
+        <meta name="text:Link 1 URL" content="">
+        <meta name="text:Link 2" content="">
+        <meta name="text:Link 2 URL" content="">
+        <meta name="text:Link 3" content="">
+        <meta name="text:Link 3 URL" content="">
+        <meta name="text:Link 4" content="">
+        <meta name="text:Link 4 URL" content="">
+        <meta name="text:Link 5" content="">
+        <meta name="text:Link 5 URL" content="">
+        <meta name="text:Link 6" content="">
+        <meta name="text:Link 6 URL" content="">
+
+        <link href="https://fonts.googleapis.com/css?family=ABeeZee:400,400italic|Lato:400,400italic,700,700italic" rel="stylesheet">
+
+    </head>
+    <body>
+
+<!-- sidebars ----------------------------------------------------------------->        
+
+        <aside id="sidebar-left">
+            <section>
+                {block:ifShowAvatar}<a href="/"><img src="{PortraitURL-128}" class="avatar"></a>{/block:ifShowAvatar}
+                <h1 class="title"><a href="/">{Title}</a></h1>
+                <div class="description">{Description}</div>
+            </section>
+
+            <section>
+                <nav class="menu">
+                    {block:ifHomeLink}<li><a href="/">{text:home link}</a></li>{/block:ifHomeLink}
+                    {block:ifArchiveLink}<li><a href="/archive">{text:archive link}</a></li>{/block:ifArchiveLink}
+                    {block:ifAskLink}<li><a href="/ask">{text:ask link}</a></li>{/block:ifAskLink}
+                    {block:HasPages}{block:Pages}<li><a href="{URL}">{Label}</a></li> {/block:Pages}{/block:HasPages}
+                    {block:ifLink1}<li><a href="{text:link 1 url}">{text:link 1}</a></li>{/block:ifLink1}
+                    {block:ifLink2}<li><a href="{text:link 2 url}">{text:link 2}</a></li>{/block:ifLink2}
+                    {block:ifLink3}<li><a href="{text:link 3 url}">{text:link 3}</a></li>{/block:ifLink3}
+                    {block:ifLink4}<li><a href="{text:link 4 url}">{text:link 4}</a></li>{/block:ifLink4}
+                    {block:ifLink5}<li><a href="{text:link 5 url}">{text:link 5}</a></li>{/block:ifLink5}
+                    {block:ifLink6}<li><a href="{text:link 6 url}">{text:link 6}</a></li>{/block:ifLink6}
+                </nav>
+            </section>
+        </aside>
+
+        <aside id="sidebar-right">
+            {block:ifRightSidebarImage}
+            <section>
+                <a href="/"><img class="side" src="{image:right sidebar image}"></a>
+            </section>
+            {/block:ifRightSidebarImage}
+        </aside>
+
+<!-- posts -------------------------------------------------------------------->
+
+        <div class="content">
+        {block:Posts}
+        <article class="entry" id="{PostID}">
+        <section class="post">
+
+            {block:Photo}
+            <!-- photo: single image post -->
+            <div class="media">
+                {LinkOpenTag}
+                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}">
+                {LinkCloseTag}
+            </div>
+            {/block:Photo}
+
+            {block:Photoset}
+            <!-- photoset: multiple images in one post.
+                 {block:Photos} loops each photo inside the set. -->
+            <div class="media photoset">
+                {block:Photos}
+                <div class="photo-data">
+                    <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}" height="{PhotoHeight-HighRes}">
+                </div>
+                {/block:Photos}
+            </div>
+            {/block:Photoset}
+
+            {block:Video}
+            <!-- video: Video-500 is Tumblr's pre-built embed markup, not a raw file -->
+            <div class="media video">{Video-500}</div>
+            {/block:Video}
+
+            {block:Text}
+            <!-- text: Title is optional per-post, guard it with its own block -->
+            {block:Title}<h1 class="title">{Title}</h1>{/block:Title}
+            <div class="text">{Body}</div>
+            {/block:Text}
+
+            {block:Quote}
+            <div class="quote title">{Quote}</div>
+            {block:Source}<div class="source text">{Source}</div>{/block:Source}
+            {/block:Quote}
+
+            {block:Answer}
+            <!-- answer: your reply to an ask -->
+            <div class="question">
+                <div class="asker">{Asker} asked:</div>
+                <div class="inquiry text">{Question}</div>
+            </div>
+            <div class="answer text">{Answer}</div>
+            {/block:Answer}
+
+            {block:Caption}
+            <!-- caption: the text you (or a reblogged-from post) attached to media posts -->
+            <div class="caption text">{Caption}</div>
+            {/block:Caption}
+
+            {block:Date}
+            <div class="date accent">
+                <a href="{Permalink}">{DayOfMonth} {Month} {Year}</a>
+
+                {block:NoteCount}
+                <span class="notes"> · {NoteCountWithLabel}</span>
+                {/block:NoteCount}
+
+                {block:HasTags}
+                <div class="tags">
+                    {block:Tags}<a href="{TagURL}" class="tag">#{Tag}</a>{/block:Tags}
+                </div>
+                {/block:HasTags}
+            </div>
+            {/block:Date}
+
+        </section>
+        </article>
+        {/block:Posts}
+        </div>
+
+        {block:Pagination}
+        <!-- pagination: shown when infinite scroll is off, or as a fallback -->
+        <div class="pagination">
+            {block:PreviousPage}<a href="{PreviousPage}" class="prev">newer</a>{/block:PreviousPage}
+            {block:NextPage}<a href="{NextPage}" class="next">older</a>{/block:NextPage}
+        </div>
+        {/block:Pagination}
+
+    </body>
