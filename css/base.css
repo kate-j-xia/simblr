@@ -1,3 +1,10 @@
+/* -- colors ---------------------------------------------------------------- */
+
+:root {
+    --primary-bg-color: #ffffff;
+    --primary-text-color: #111111;
+}
+
 /* -- typography ------------------------------------------------------------ */
 body {
     margin:0;
@@ -5,6 +12,6 @@ body {
     font-family:JetBrains Mono, serif;
     text-align:left;
     word-wrap:break-word;
-    color:#111111;
-    background:#ffffff;
+    color:var(--primary-text-color);
+    background:var(--primary-bg-color);
 }

@@ -8,31 +8,26 @@
             <meta name="description" content="{MetaDescription}">
         {/block:Description}
         <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-<!-- scripts ------------------------------------------------------------------>
+        <!------ THEME OPTIONS ------>
 
-        <link rel="stylesheet" href="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/css/base.css">
-        <link rel="stylesheet" href="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/css/dark.css">
-        <script src="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/js/theme.js"></script>
-
-<!-- defaults ----------------------------------------------------------------->
-
-        <meta name="image:Right Sidebar Image" content="">
-        <meta name="if:Right Sidebar Image" content="">
-        <meta name="color:Link Hover" content="#f08dbd">
-        <meta name="select:Font Size" content="9px" title="9px">
-        <meta name="select:Font Size" content="10px" title="10px">
-        <meta name="select:Font Size" content="11px" title="11px">
-        <meta name="select:Font Size" content="12px" title="12px">
-        <meta name="if:Dark Default" content="">
-        <meta name="if:Show Avatar" content="">
-        <meta name="if:Show Captions" content="">
-        <meta name="if:Show Tags" content="">
-        <meta name="if:Infinite Scroll" content="">
+        <meta name="image:Sidebar image" content="">
+        <meta name="color:Link hover" content="#f08dbd">
+        <meta name="select:Font size" content="9px" title="9px">
+        <meta name="select:Font size" content="10px" title="10px">
+        <meta name="select:Font size" content="11px" title="11px">
+        <meta name="select:Font size" content="12px" title="12px">
+        <meta name="if:Dark default" content="">
+        <meta name="if:Show profile" content="">
+        <meta name="if:Show captions" content="">
+        <meta name="if:Show tags" content="">
+        <meta name="if:Infinite scroll" content="">
         <meta name="text:Posts" content="500px">
-        <meta name="text:Home Link" content="">
-        <meta name="text:Archive Link" content="">
-        <meta name="text:Ask Link" content="contact">
+        <meta name="text:Home link" content="">
+        <meta name="text:Archive link" content="">
+        <meta name="text:Ask link" content="contact">
         <meta name="text:Link 1" content="">
         <meta name="text:Link 1 URL" content="">
         <meta name="text:Link 2" content="">
@@ -50,17 +45,39 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 
-    </head>
-    <body>
+        <!------ SCRIPTS & SHEETS ------->
 
-<!-- sidebars ----------------------------------------------------------------->        
+        <link href="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/css/base.css" rel="stylesheet">
+        <link href="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/css/dark.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <script defer src="/path/to/infinite-scroll.pkgd.min.js"></script>
+        <script defer src="/path/to/masonry.pkgd.min.js"></script>
+        <script defer src="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/js/theme.js"></script>
+
+
+    </head>
+
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <body>
+        
+        <!------ TUMBLR CONTROLS ------>
+
+        <!------ SIDEBAR ------>        
 
         <aside id="sidebar-left">
             <section>
-                {block:ifShowAvatar}<a href="/"><img src="{PortraitURL-128}" class="avatar"></a>{/block:ifShowAvatar}
+                {block:ifShowProfile}<a href="/"><img src="{PortraitURL-128}" class="avatar"></a>{/block:ifShowProfile}
                 <h1 class="title"><a href="/">{Title}</a></h1>
                 <div class="description">{Description}</div>
             </section>
+
+            <!------ sidebar box 1 ------>
+
+            <!------ sidebar box 2 ------>
+
+            <!------ sidebar box 3 ------>
 
             <section>
                 <nav class="menu">
@@ -86,91 +103,348 @@
             {/block:ifRightSidebarImage}
         </aside>
 
-<!-- posts -------------------------------------------------------------------->
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++-->
+        
+        <main>
 
-        <div class="content">
-        {block:Posts}
-        <article class="entry" id="{PostID}">
-        <section class="post">
+            <!----- POSTS ------>
 
-            {block:Photo}
-            <!-- photo: single image post -->
-            <div class="media">
-                {LinkOpenTag}
-                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}">
-                {LinkCloseTag}
-            </div>
-            {/block:Photo}
+            <section class="posts">
 
-            {block:Photoset}
-            <!-- photoset: multiple images in one post.
-                 {block:Photos} loops each photo inside the set. -->
-            <div class="media photoset">
-                {block:Photos}
-                <div class="photo-data">
-                    <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}" height="{PhotoHeight-HighRes}">
+                <article
+                    class="posts"
+                    id="post-{PostID}"
+                    post-type="{PostType}"
+                    {block:NotReblog}original-post{/block:NotReblog}
+                    {block:RebloggedFrom}reblogged-post via-name="{ReblogParentName}" src-name="{ReblogRootName}"{/block:RebloggedFrom}
+                    username="{block:NotReblog}{Name}{/block:NotReblog}{block:RebloggedFrom}{ReblogRootName}{/block:RebloggedFrom}"
+                    root-url="{block:NotReblog}{Permalink}{block:NotReblog}{block:RebloggedFrom}{ReblogRootURL}{/block:RebloggedFrom}"
+                    {block:HasTags}has-tags{/block:HasTags}
+                >
+                    <div class="post-outer">
+                
+                        <div class="post-inner">
+                            
+                            <!----- POST HEADER ----->
+                            {block:Date}
+                            {block:PinnedPostLabel}
+                            <header class="post-header">
+                                <div class="ph-inner">
+                                    <!-- "pinned post" -->
+                                    <div class="ph-left">
+                                        <{block:IndexPage}a href="{Permalink}"{/block:IndexPage}{block:PermalinkPage}div{/block:PermalinkPage} class="pinned-flex">
+                                            <i class="mageicons" icon-name="pin" stroke="1.75"></i>
+                                            <span>{PinnedPostLabel}</span>
+                                        </{block:IndexPage}a{/block:IndexPage}{block:PermalinkPage}div{/block:PermalinkPage}>
+                                    </div>
+                                    
+                                    <!-- originally by @name -->
+                                    <div class="ph-right">
+                                        <a class="ph-user-display" href="{block:NotReblog}{Permalink}{/block:NotReblog}{block:RebloggedFrom}{ReblogRootURL}{/block:RebloggedFrom}" aria-label="{block:NotReblog}Original post{/block:NotReblog}{block:RebloggedFrom}{lang:Originally from ReblogRootName}{/block:RebloggedFrom}">{block:NotReblog}{Name}{/block:NotReblog}{block:RebloggedFrom}{ReblogRootName}{/block:RebloggedFrom}</a>
+                                    </div>
+                                </div><!--end ph-inner-->
+                            </header><!--end post-header-->
+                            {/block:PinnedPostLabel}
+                            {/block:Date}
+                            
+                            <div class="post-body">
+                                <div class="post-body-inner">
+
+                                    <!------ TEXT POST: TITLE ------>
+                                    {block:Text}
+                                    {block:Title}
+                                    <div class="text-post">
+                                        <h1 class="post-title">{Title}</h1>
+                                    </div>
+                                    {/block:Title}
+                                    {/block:Text}
+                                    
+                                    <!------ PHOTO POST: SINGLE ------>
+                                    {block:Photo}
+                                    <div class="photo-post">
+                                        <div class="legacy-photo">
+                                            <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}" onclick="Tumblr.Lightbox.init([{'width':{PhotoWidth-HighRes},'height':{PhotoHeight-HighRes},'low_res':'{PhotoURL-500}','high_res':'{PhotoURL-HighRes}'}])">
+                                        </div>
+                                    </div>
+                                    {/block:Photo}
+                                    
+                                    <!------ PHOTO POST: PHOTOSET ------>
+                                    {block:Photoset}
+                                    <div class="photoset-post">
+                                        <div class="legacy-photoset" layout="{PhotosetLayout}">
+                                            {block:Photos}
+                                            <img src="{PhotoURL-HighRes}" data-width="{PhotoWidth-HighRes}" data-height="{PhotoHeight-HighRes}" data-low-res="{PhotoURL-500}" alt="{PhotoAlt}">
+                                            {/block:Photos}
+                                        </div>
+                                    </div>
+                                    {/block:Photoset}
+
+                                    <!------ CHAT POST ------>
+                                    {block:Chat}
+                                    <div class="chat-post">
+                                        <ul class="chat-wrap">
+                                            {block:Lines}
+                                            <li class="chat-line {Alt}">
+                                                {block:Label}
+                                                <b class="chat-label">{Label}</b>
+                                                {/block:Label}
+
+                                                <span class="chat-content"> {Line}</span>
+                                            </li>
+                                            {/block:Lines}
+                                        </ul>
+                                    </div>
+                                    {/block:Chat}
+                                    
+                                    <!------ AUDIO POST ------>
+                                    {block:Audio}
+                                    <div class="audio-post">
+                                        <div class="legacy-audio">
+                                            {block:AudioPlayer}
+                                            <div class="legacy-audio-info" data-title="{block:TrackName}{PlaintextTrackName}{/block:TrackName}" data-artist="{block:Artist}{PlaintextArtist}{/block:Artist}" data-album="{block:Album}{PlaintextAlbum}{/block:Album}" data-album-cover="{block:AlbumArt}{AlbumArtURL}{/block:AlbumArt}">{AudioPlayer}</div>
+                                            {/block:AudioPlayer}
+                                        </div>
+                                    </div>
+                                    {/block:Audio}
+                                    
+                                    <!------ VIDEO POST ------>
+                                    {block:Video}
+                                    <div class="video-post">
+                                        <div class="legacy-video">
+                                            {Video-700}
+
+                                            {block:VideoThumbnail}
+                                            <span class="poster-thumb" url="{VideoThumbnailURL}"></span>
+                                            {/block:VideoThumbnail}
+                                        </div>
+                                    </div>
+                                    {/block:Video}
+                                    
+                                    <!------ ASK POST ------>
+                                    {block:Answer}
+                                    <div class="ask-post">
+                                        <dl class="qa-set">
+                                            <!-- question -->
+                                            <dt class="que-sect">
+                                                <div class="que-flex">
+                                                    <img src="{AskerPortraitURL-128}" alt="{PlaintextAsker}&rsquo;s avatar">
+                                                    <div class="que-right">
+                                                        <p class="ask-head" role="heading" aria-level="6">
+                                                            <span data-user="{PlaintextAsker}">{Asker}</span> asked:
+                                                        </p>
+                                                        <div class="que">{Question}</div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </dt><!--end question-->
+                                            
+                                            <!-- answer -->
+                                            <dd class="ans-sect">
+                                                <div class="ans-flex">
+                                                    <div class="ans-left">
+                                                        <p class="ans-head" role="heading" aria-level="6">
+                                                            {block:NotReblog}<a href="{Permalink}">{Name}</a>{/block:NotReblog}
+                                                            {block:Answerer}<span data-user="{PlaintextAnswerer}">{Answerer}</span>{/block:Answerer}
+                                                            answered:
+                                                        </p>
+                                                        <div class="ans">
+                                                            {block:NotReblog}{Replies}{/block:NotReblog}
+                                                            {block:Answerer}{Answer}{/block:Answerer}
+                                                        </div>
+                                                    </div>
+                                                    <img src="{block:NotReblog}{PortraitURL-128}{/block:NotReblog}{block:Answerer}{AnswererPortraitURL-128}{/block:Answerer}" alt="{block:NotReblog}{Name}{/block:NotReblog}{block:Answerer}{PlaintextAnswerer}{/block:Answerer}&rsquo;s avatar">
+                                                </div>
+                                            </dd><!--end answer-->
+                                        </dl><!--end q&a-->
+                                    </div>
+                                    {/block:Answer}
+                                    
+                                    <!----- CAPTIONS / REBLOGS ----->
+                                    {block:NotReblog}
+                                    <div class="comments {PostType}-post-caption legacy-original-caption">
+                                        <div class="comment">
+                                            <div class="comment-body">
+                                                {block:Text}{Body}{/block:Text}
+                                                {block:Photo}{block:Caption}{Caption}{/block:Caption}{/block:Photo}
+                                                {block:Photoset}{block:Caption}{Caption}{/block:Caption}{/block:Photoset}
+                                                {block:Link}{Description}{/block:Link}
+                                                {block:Audio}{block:Caption}{Caption}{/block:Caption}{/block:Audio}
+                                                {block:Video}{block:Caption}{Caption}{/block:Caption}{/block:Video}
+                                                {block:ContentSource}
+                                                <p class="content-src">
+                                                    ({lang:Source}: <a href="{SourceURL}">{SourceTitle}</a>)
+                                                </p>
+                                                {/block:ContentSource}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/block:NotReblog}
+                                    
+                                    {block:RebloggedFrom}
+                                    <div class="comments {PostType}-post-reblogs">
+                                        {block:Reblogs}
+                                        <div class="comment">
+                                            <div class="comment-header">
+                                                <a class="user-flex" href="{block:IsOriginalEntry}{ReblogRootURL}{/block:IsOriginalEntry}{block:IsNotOriginalEntry}{Permalink}{/block:IsNotOriginalEntry}">
+                                                    <div class="userpic">
+                                                        <img src="{block:IsOriginalEntry}{ReblogRootPortraitURL-64}{/block:IsOriginalEntry}{block:IsNotOriginalEntry}{PortraitURL-64}{/block:IsNotOriginalEntry}" alt="{block:IsOriginalEntry}{ReblogRootName}{/block:IsOriginalEntry}{block:IsNotOriginalEntry}{Username}{/block:IsNotOriginalEntry}&rsquo;s avatar">
+                                                    </div>
+                                                    
+                                                    <div class="username">
+                                                        <div class="username-inner">
+                                                            <span class="username-txt" data-user="{block:IsOriginalEntry}{ReblogRootName}{/block:IsOriginalEntry}{block:IsNotOriginalEntry}{Username}{/block:IsNotOriginalEntry}">{block:IsOriginalEntry}{ReblogRootName}{/block:IsOriginalEntry}{block:IsNotOriginalEntry}{Username}{/block:IsNotOriginalEntry}</span>
+                                                        </div>
+                                                    </div>
+                                                </a><!--end user-flex-->
+                                            </div><!--end comment-header-->
+                                            
+                                            <div class="comment-body">
+                                                {Body}
+                                                {block:ContentSource}
+                                                <p class="content-src">
+                                                    ({lang:Source}: <a href="{SourceURL}">{SourceTitle}</a>)
+                                                </p>
+                                                {/block:ContentSource}
+                                            </div>
+                                        </div><!--end comment-->
+                                        {/block:Reblogs}
+                                    </div><!--end comments-->
+                                    {/block:RebloggedFrom}
+                                    
+                                    <!----- TAGS ----->
+                                    {block:HasTags}
+                                    <div class="tagscont" tags-align="{select:tags position}" role="list">
+                                        <div class="tc-inner-1">
+                                            <div class="tc-inner-2">
+                                                {block:Tags}
+                                                <a href="{TagURL}" role="listitem">{Tag}</a>
+                                                {/block:Tags}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/block:HasTags}
+                                </div><!--end post-body-inner-->
+                            </div><!--end post-body-->
+                        
+                            <!----- POST FOOTER ----->
+                            {block:Date}
+                            <footer class="post-footer">
+                                <!---- PERMALINK + CONTROLS ---->
+                                <div class="pf-inner">
+                                    <!---- POST INFO (LEFT) ---->
+                                    <div class="post-info-left">
+                                        <!---- PERMALINK / POST DATE ---->
+                                        <{block:IndexPage}a href="{Permalink}" aria-label="{block:NotReblog}Posted{/block:NotReblog}{block:RebloggedFrom}Reblogged{/block:RebloggedFrom} {TimeAgo}"{/block:IndexPage}{block:PermalinkPage}div{/block:PermalinkPage} class="post-date">
+                                            <time date-group datetime="{Year}-{MonthNumberWithZero}-{DayOfMonthWithZero}T{24HourWithZero}:{Minutes}">
+                                                <span date-text single-line>
+                                                    <span date-text-inner>
+                                                        {block:PermalinkPage}{block:NotReblog}Posted{/block:NotReblog}{block:RebloggedFrom}Reblogged{/block:RebloggedFrom}{/block:PermalinkPage}<span class="normal-timeago">{TimeAgo}</span><span class="shortened-timeago tsx" lang="en">{Timestamp}</span>{block:IndexPage}{block:NoteCount}&emsp13;&middot;&emsp13;<span class="normal-notecount tsx">{NoteCount}</span><span class="shortened-notecount tsx">{NoteCount}</span><span class="notecount-label-single nc-{NoteCount} tsx"></span><span class="notecount-label-plural nc-{NoteCount} tsx"></span>{/block:NoteCount}{/block:IndexPage}{block:PermalinkPage}&emsp13;&middot;&emsp13;{ShortMonth} {DayOfMonthWithZero}{DayOfMonthSuffix} &lsquo;{ShortYear}{/block:PermalinkPage}
+                                                    </span>
+                                                </span>
+                                            </time>
+                                        </{block:IndexPage}a{/block:IndexPage}{block:PermalinkPage}div{/block:PermalinkPage}><!--end post-date-->
+                                        
+                                        <!---- VIA / OG POSTER ---->
+                                        {block:PermalinkPage}
+                                        {block:RebloggedFrom}
+                                        <div class="via-and-op" single-row role="list">
+                                            <i class="mageicons" icon-name="note" stroke="2"></i>
+                                            
+                                            <!-- via / reblogged from -->
+                                            <div class="via-part" data-via="{ReblogParentName}" role="listitem">
+                                                <span>{lang:Via}: </span>
+                                                <a href="{ReblogParentURL}" aria-label="{PlaintextReblogParentTitle}" data-user="{ReblogParentName}">{ReblogParentName}</a>
+                                            </div>
+                                            
+                                            <!-- bullet/separator -->
+                                            <div class="via-op-sep">&middot;</div>
+                                            
+                                            <!-- OG poster -->
+                                            <div class="op-part" data-op="{ReblogRootName}" role="listitem">
+                                                <span>By: </span>
+                                                <a href="{ReblogRootURL}" aria-label="{PlaintextReblogRootTitle}" data-user="{ReblogRootName}">{ReblogRootName}</a>
+                                            </div>
+                                        </div>
+                                        {/block:RebloggedFrom}
+                                        {/block:PermalinkPage}
+                                    </div><!--end post-info-left-->
+                                    
+                                    <!----- POST CONTROLS ----->
+                                    <div class="post-btns" role="group">
+                                        <!-- show/hide tags btn -->
+                                        {block:HasTags}
+                                        <label for="tags-{PostID}" class="tags-btn">
+                                            <input id="tags-{PostID}" type="checkbox" data-show-tags="{lang:Show} {lang:Tags}" data-hide-tags="{lang:Close} {lang:Tags}"/>
+                                            <i class="mageicons" stroke="2" icon-name="hash"></i>
+                                        </label>
+                                        {/block:HasTags}
+                                        
+                                        <!-- reblog btn -->
+                                        <a class="rb-btn" href="{ReblogURL}" aria-label="{block:English}Reblog{/block:English}{block:German}Rebloggen{/block:German}{block:French}Rebloguer{/block:French}{block:Italian}Reblogga{/block:Italian}{block:Japanese}リブログ{/block:Japanese}{block:Turkish}Yeniden Blogla{/block:Turkish}{block:Spanish}Rebloguear{/block:Spanish}{block:Russian}Реблог{/block:Russian}{block:Polish}Rebloguj{/block:Polish}{block:PortuguesePT}Reblogar{/block:PortuguesePT}{block:PortugueseBR}Reblogar{/block:PortugueseBR}{block:Dutch}Rebloggen{/block:Dutch}{block:Korean}리블로그{/block:Korean}{block:ChineseSimplified}转发{/block:ChineseSimplified}{block:ChineseTraditional}轉格{/block:ChineseTraditional}{block:ChineseHK}轉載{/block:ChineseHK}{block:Indonesian}Reblog{/block:Indonesian}{block:Hindi}रीब्लॉग करेंे{/block:Hindi}" target="_blank">
+                                            <i class="mageicons" stroke="1.75" icon-name="reload"></i>
+                                        </a>
+                                        
+                                        <!-- like btn -->
+                                        <button class="like-btn" data-like="{block:English}Like{/block:English}{block:German}Liken{/block:German}{block:French}J'aime{/block:French}{block:Italian}Mi piace{/block:Italian}{block:Japanese}スキ{/block:Japanese}{block:Turkish}Beğen{/block:Turkish}{block:Spanish}Me gusta{/block:Spanish}{block:Russian}Нравится{/block:Russian}{block:Polish}Lubię{/block:Polish}{block:PortuguesePT}Gostar{/block:PortuguesePT}{block:PortugueseBR}Curtir{/block:PortugueseBR}{block:Dutch}Vind ik leuk{/block:Dutch}{block:Korean}좋아요{/block:Korean}{block:ChineseSimplified}喜欢{/block:ChineseSimplified}{block:ChineseTraditional}喜歡{/block:ChineseTraditional}{block:ChineseHK}喜歡{/block:ChineseHK}{block:Indonesian}Suka{/block:Indonesian}{block:Hindi}पसंद करें{/block:Hindi}" data-unlike="{block:English}Unlike{/block:English}{block:German}Entliken{/block:German}{block:French}Je n'aime plus{/block:French}{block:Italian}Non mi piace{/block:Italian}{block:Japanese}スキ解除{/block:Japanese}{block:Turkish}Beğenme{/block:Turkish}{block:Spanish}Ya no me gusta{/block:Spanish}{block:Russian}Не нравится{/block:Russian}{block:Polish}Nie lubię{/block:Polish}{block:PortuguesePT}Deixar de gostar{/block:PortuguesePT}{block:PortugueseBR}Curtir (desfazer){/block:PortugueseBR}{block:Dutch}Vind ik niet meer leuk{/block:Dutch}{block:Korean}좋아요 취소{/block:Korean}{block:ChineseSimplified}取消喜欢{/block:ChineseSimplified}{block:ChineseTraditional}收回喜歡{/block:ChineseTraditional}{block:ChineseHK}收回喜歡{/block:ChineseHK}{block:Indonesian}Tidak Suka{/block:Indonesian}{block:Hindi}पसंद हटाएँ{/block:Hindi}">
+                                            {LikeButton}
+                                            <i class="mageicons outline-style" stroke="1.75" icon-name="heart"></i>
+                                            <i class="mageicons solid-style" solid icon-name="heart"></i>
+                                        </button>
+                                    </div><!--end post-btns-->
+                                </div><!--end pf-inner-->
+                            </footer><!--end post-footer-->
+                            {/block:Date}
+                        </div><!--end post-inner-->
+                    </div><!--end post-outer-->
+                </article><!--end posts-->
+        
+                <!----- POST NOTES ----->
+                {block:PostNotes}
+                <article class="post-notes">
+                <div class="post-inner">
+                    <div class="post-body">
+                        <div class="post-body-inner">
+                            {block:NoteCount}
+                            <h2 class="post-title"><span class="normal-notecount tsx">{NoteCount}</span><span class="shortened-notecount tsx">{NoteCount}</span><span class="notecount-label-single nc-{NoteCount} tsx"></span><span class="notecount-label-plural nc-{NoteCount} tsx"></span></h2>
+                            {/block:NoteCount}
+                            {PostNotes}
+                        </div>
+                    </div>
                 </div>
-                {/block:Photos}
-            </div>
-            {/block:Photoset}
+                </article>
+                {/block:PostNotes}
 
-            {block:Video}
-            <!-- video: Video-500 is Tumblr's pre-built embed markup, not a raw file -->
-            <div class="media video">{Video-500}</div>
-            {/block:Video}
-
-            {block:Text}
-            <!-- text: Title is optional per-post, guard it with its own block -->
-            {block:Title}<h1 class="title">{Title}</h1>{/block:Title}
-            <div class="text">{Body}</div>
-            {/block:Text}
-
-            {block:Quote}
-            <div class="quote title">{Quote}</div>
-            {block:Source}<div class="source text">{Source}</div>{/block:Source}
-            {/block:Quote}
-
-            {block:Answer}
-            <!-- answer: your reply to an ask -->
-            <div class="question">
-                <div class="asker">{Asker} asked:</div>
-                <div class="inquiry text">{Question}</div>
-            </div>
-            <div class="answer text">{Answer}</div>
-            {/block:Answer}
-
-            {block:Caption}
-            <!-- caption: the text you (or a reblogged-from post) attached to media posts -->
-            <div class="caption text">{Caption}</div>
-            {/block:Caption}
-
-            {block:Date}
-            <div class="date accent">
-                <a href="{Permalink}">{DayOfMonth} {Month} {Year}</a>
-
-                {block:NoteCount}
-                <span class="notes"> · {NoteCountWithLabel}</span>
-                {/block:NoteCount}
-
-                {block:HasTags}
-                <div class="tags">
-                    {block:Tags}<a href="{TagURL}" class="tag">#{Tag}</a>{/block:Tags}
+                <!----- POST NOTES ----->
+                {block:PostNotes}
+                <article class="post-notes">
+                <div class="post-inner">
+                    <div class="post-body">
+                        <div class="post-body-inner">
+                            {block:NoteCount}
+                            <h2 class="post-title"><span class="normal-notecount tsx">{NoteCount}</span><span class="shortened-notecount tsx">{NoteCount}</span><span class="notecount-label-single nc-{NoteCount} tsx"></span><span class="notecount-label-plural nc-{NoteCount} tsx"></span></h2>
+                            {/block:NoteCount}
+                            {PostNotes}
+                        </div>
+                    </div>
                 </div>
-                {/block:HasTags}
-            </div>
-            {/block:Date}
+                </article>
+                {/block:PostNotes}
+        
+            {/block:Posts}
+            </section><!--end all-posts-->
 
-        </section>
-        </article>
-        {/block:Posts}
-        </div>
+        <!--+++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-        {block:Pagination}
-        <!-- pagination: shown when infinite scroll is off, or as a fallback -->
-        <div class="pagination">
-            {block:PreviousPage}<a href="{PreviousPage}" class="prev">newer</a>{/block:PreviousPage}
-            {block:NextPage}<a href="{NextPage}" class="next">older</a>{/block:NextPage}
-        </div>
-        {/block:Pagination}
+            <!------ INFINITE SCROLL ------>
+
+            {block:PreviousPage}<a href="{PreviousPage}">{lang:Previous page} </a>{/block:PreviousPage}
+
+            {block:NextPage}<a href="{NextPage}">  {lang:Next page}</a>{/block:NextPage}
+
+            {block:IndexPage}{block:ifInfiniteScroll}
+            
+            {/block:ifInfiniteScroll}{/block:IndexPage}
+                
+        </main>
 
     </body>
