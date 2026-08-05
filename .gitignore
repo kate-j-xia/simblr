@@ -1,2 +1,4 @@
 .DS_Store
-*.md
+/work-docs
+ref.html
+ref2.html
