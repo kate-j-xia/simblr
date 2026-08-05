@@ -1,0 +1,10 @@
+/* -- typography ------------------------------------------------------------ */
+body {
+    margin:0;
+    font-size:{select:font size};
+    font-family:JetBrains Mono, serif;
+    text-align:left;
+    word-wrap:break-word;
+    color:#111111;
+    background:#ffffff;
+}
