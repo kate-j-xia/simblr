@@ -76,6 +76,28 @@ section.posts.is-loaded {
     transition: opacity .3s ease;
 }
 
+/* -- post icons ------------------------------------------------------------ */
+
+/* Material Icons ship at 24px; scale to sit inline with post text. */
+.post-icon {
+    font-size: 1.15em;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+/* Like button shows the outline heart until Tumblr marks the post liked. */
+.like-btn .solid-style {
+    display: none;
+}
+
+.like-btn.liked .outline-style {
+    display: none;
+}
+
+.like-btn.liked .solid-style {
+    display: inline;
+}
+
 /* -- layout toggle ------------------------------------------------------- */
 
 .layout-toggle {

@@ -141,7 +141,7 @@
                                     <!-- "pinned post" -->
                                     <div class="ph-left">
                                         <{block:IndexPage}a href="{Permalink}"{/block:IndexPage}{block:PermalinkPage}div{/block:PermalinkPage} class="pinned-flex">
-                                            <i class="mageicons" icon-name="pin" stroke="1.75"></i>
+                                            <i class="material-icons post-icon">push_pin</i>
                                             <span>{PinnedPostLabel}</span>
                                         </{block:IndexPage}a{/block:IndexPage}{block:PermalinkPage}div{/block:PermalinkPage}>
                                     </div>
@@ -356,7 +356,7 @@
                                         {block:PermalinkPage}
                                         {block:RebloggedFrom}
                                         <div class="via-and-op" single-row role="list">
-                                            <i class="mageicons" icon-name="note" stroke="2"></i>
+                                            <i class="material-icons post-icon">notes</i>
                                             
                                             <!-- via / reblogged from -->
                                             <div class="via-part" data-via="{ReblogParentName}" role="listitem">
@@ -383,20 +383,20 @@
                                         {block:HasTags}
                                         <label for="tags-{PostID}" class="tags-btn">
                                             <input id="tags-{PostID}" type="checkbox" data-show-tags="{lang:Show} {lang:Tags}" data-hide-tags="{lang:Close} {lang:Tags}"/>
-                                            <i class="mageicons" stroke="2" icon-name="hash"></i>
+                                            <i class="material-icons post-icon">tag</i>
                                         </label>
                                         {/block:HasTags}
                                         
                                         <!-- reblog btn -->
                                         <a class="rb-btn" href="{ReblogURL}" aria-label="{block:English}Reblog{/block:English}{block:German}Rebloggen{/block:German}{block:French}Rebloguer{/block:French}{block:Italian}Reblogga{/block:Italian}{block:Japanese}リブログ{/block:Japanese}{block:Turkish}Yeniden Blogla{/block:Turkish}{block:Spanish}Rebloguear{/block:Spanish}{block:Russian}Реблог{/block:Russian}{block:Polish}Rebloguj{/block:Polish}{block:PortuguesePT}Reblogar{/block:PortuguesePT}{block:PortugueseBR}Reblogar{/block:PortugueseBR}{block:Dutch}Rebloggen{/block:Dutch}{block:Korean}리블로그{/block:Korean}{block:ChineseSimplified}转发{/block:ChineseSimplified}{block:ChineseTraditional}轉格{/block:ChineseTraditional}{block:ChineseHK}轉載{/block:ChineseHK}{block:Indonesian}Reblog{/block:Indonesian}{block:Hindi}रीब्लॉग करेंे{/block:Hindi}" target="_blank">
-                                            <i class="mageicons" stroke="1.75" icon-name="reload"></i>
+                                            <i class="material-icons post-icon">repeat</i>
                                         </a>
                                         
                                         <!-- like btn -->
                                         <button class="like-btn" data-like="{block:English}Like{/block:English}{block:German}Liken{/block:German}{block:French}J'aime{/block:French}{block:Italian}Mi piace{/block:Italian}{block:Japanese}スキ{/block:Japanese}{block:Turkish}Beğen{/block:Turkish}{block:Spanish}Me gusta{/block:Spanish}{block:Russian}Нравится{/block:Russian}{block:Polish}Lubię{/block:Polish}{block:PortuguesePT}Gostar{/block:PortuguesePT}{block:PortugueseBR}Curtir{/block:PortugueseBR}{block:Dutch}Vind ik leuk{/block:Dutch}{block:Korean}좋아요{/block:Korean}{block:ChineseSimplified}喜欢{/block:ChineseSimplified}{block:ChineseTraditional}喜歡{/block:ChineseTraditional}{block:ChineseHK}喜歡{/block:ChineseHK}{block:Indonesian}Suka{/block:Indonesian}{block:Hindi}पसंद करें{/block:Hindi}" data-unlike="{block:English}Unlike{/block:English}{block:German}Entliken{/block:German}{block:French}Je n'aime plus{/block:French}{block:Italian}Non mi piace{/block:Italian}{block:Japanese}スキ解除{/block:Japanese}{block:Turkish}Beğenme{/block:Turkish}{block:Spanish}Ya no me gusta{/block:Spanish}{block:Russian}Не нравится{/block:Russian}{block:Polish}Nie lubię{/block:Polish}{block:PortuguesePT}Deixar de gostar{/block:PortuguesePT}{block:PortugueseBR}Curtir (desfazer){/block:PortugueseBR}{block:Dutch}Vind ik niet meer leuk{/block:Dutch}{block:Korean}좋아요 취소{/block:Korean}{block:ChineseSimplified}取消喜欢{/block:ChineseSimplified}{block:ChineseTraditional}收回喜歡{/block:ChineseTraditional}{block:ChineseHK}收回喜歡{/block:ChineseHK}{block:Indonesian}Tidak Suka{/block:Indonesian}{block:Hindi}पसंद हटाएँ{/block:Hindi}">
                                             {LikeButton}
-                                            <i class="mageicons outline-style" stroke="1.75" icon-name="heart"></i>
-                                            <i class="mageicons solid-style" solid icon-name="heart"></i>
+                                            <i class="material-icons post-icon outline-style">favorite_border</i>
+                                            <i class="material-icons post-icon solid-style">favorite</i>
                                         </button>
                                     </div><!--end post-btns-->
                                 </div><!--end pf-inner-->
