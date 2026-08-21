@@ -38,8 +38,11 @@ section.posts {
     height: 0;
 }
 
+/* Must match .grid__item width exactly: Masonry fits columns as
+   containerWidth / (colSizer + gutter), so a plain 50% here plus a gutter
+   overflows and collapses to a single column. */
 .grid__col-sizer {
-    width: 50%;
+    width: calc(50% - 20px);
 }
 
 .grid__gutter-sizer {
