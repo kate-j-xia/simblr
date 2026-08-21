@@ -15,13 +15,3 @@ imagesLoaded(
         msnry.appended(items);
     }
 )
-
-let infScroll = new InfiniteScroll(
-    grid, { 
-        path: '.pagination__next',
-        append: '.grid__item',
-        outlayer: msnry,
-        status: '.page-load-status',
-        historyTitle: false,
-    }
-);

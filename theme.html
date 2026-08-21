@@ -23,7 +23,6 @@
         <meta name="if:Show profile" content="">
         <meta name="if:Show captions" content="">
         <meta name="if:Show tags" content="">
-        <meta name="if:Infinite scroll" content="">
         <meta name="text:Posts" content="500px">
         <meta name="text:Home link" content="">
         <meta name="text:Archive link" content="">
@@ -52,7 +51,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
         <script defer src="https://kate-j-xia.github.io/simblr/js/vendor/masonry.pkgd.min.js"></script>
-        <script defer src="https://kate-j-xia.github.io/simblr/js/vendor/infinite-scroll.pkgd.min.js"></script>
+        <script defer src="https://kate-j-xia.github.io/simblr/js/vendor/imagesloaded.pkgd.min.js"></script>
         <script defer src="https://kate-j-xia.github.io/simblr/js/theme.js"></script>
 
 
@@ -438,17 +437,12 @@
 
         <!--+++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-            <!------ INFINITE SCROLL ------>
+            <!------ PAGINATION ------>
 
-            {block:PreviousPage}<a href="{PreviousPage}">{lang:Previous page} </a>{/block:PreviousPage}
-
-            {block:NextPage}<a class="pagination__next" href="{NextPage}">  {lang:Next page}</a>{/block:NextPage}
-
-            {block:IndexPage}{block:ifInfiniteScroll}
-            <div class="page-load-status">
-                <div class="infinite-scroll-request-error">{lang:Error loading more posts}</div>
-            </div>
-            {/block:ifInfiniteScroll}{/block:IndexPage}
+            <footer class="pagination">
+                {block:PreviousPage}<a href="{PreviousPage}">{lang:Previous page}</a>{/block:PreviousPage}
+                {block:NextPage}<a href="{NextPage}">{lang:Next page}</a>{/block:NextPage}
+            </footer>
                 
         </main>
 
