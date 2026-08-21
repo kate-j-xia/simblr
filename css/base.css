@@ -1,17 +1,59 @@
-/* -- colors ---------------------------------------------------------------- */
+/* Reset, base typography, links, and scrollbar.
+   No layout and no components — those live in layout.css and posts.css. */
 
-:root {
-    --primary-bg-color: #ffffff;
-    --primary-text-color: #111111;
-    --title-color: #000000;
-    --blog-title-color: #000000;
-    --border-color: #f5f5f5;
-    --text-border-color: #eeeeee;
-    --scrollbar-color: #d5d5d5;
-    /* RGB of --primary-text-color; ref.html's own muted gray was too low
-       contrast against a white background to port directly. */
-    --muted-text-color: rgba(17, 17, 17, .6);
-    --heading-font: 600 .85em/1.25em "Lato", sans-serif;
+/* -- typography ------------------------------------------------------------ */
+
+body {
+    margin: 0;
+    font: var(--body-font);
+    letter-spacing: .15px;
+    color: var(--primary-text-color);
+    background: var(--primary-bg-color);
+    text-align: left;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-x: hidden;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin: .25em 0;
+    padding: 0;
+    font-weight: 600;
+    color: var(--title-color);
+}
+
+small,
+big,
+sub,
+pre {
+    /* Tumblr's editor emits these for emphasis; normalize so they don't
+       disrupt the vertical rhythm. */
+    font-size: 1em;
+    line-height: 1.5em;
+    vertical-align: baseline;
+}
+
+hr {
+    border: none;
+    margin: 2em 25%;
+    border-top: 1px solid var(--text-border-color);
+}
+
+/* -- links ------------------------------------------------------------ */
+
+a {
+    color: var(--primary-text-color);
+    text-decoration: none;
+    transition: color .3s linear;
+}
+
+a:hover {
+    color: var(--link-hover-color);
 }
 
 /* -- scrollbar --------------------------------------------------------- */
@@ -27,316 +69,4 @@
     border-radius: 6px;
     background-color: var(--scrollbar-color);
     border: 4px solid transparent;
-}
-
-/* -- typography ------------------------------------------------------------ */
-
-
-body {
-    margin:0;
-    /* No {select:...} / {color:...} here — Tumblr only substitutes template tags
-       inside theme.html; this file is served raw from GitHub Pages. */
-    font:var(--Body-Font-Weight,normal) var(--Body-Font-Size,0.9rem)/var(--Body-Line-Height,1.5) var(--Body-Font-Family), sans-serif;
-    letter-spacing:var(--Body-Letter-Spacing);
-    word-spacing:var(--Body-Word-Spacing);
-    word-break:break-word;
-    -moz-osx-font-smoothing:grayscale;
-    -webkit-font-smoothing:antialiased;
-    font-smoothing:antialiased;
-    color:var(--primary-text-color);
-    background:var(--primary-bg-color);
-}
-
-/* -- grid ------------------------------------------------------------ */
-
-/* NOTE: theme.html puts class="posts" on both the <section> and each <article>,
-   so these rules are element-qualified to avoid hitting individual posts. */
-section.posts {
-    margin: 0 0 0 375px;
-    max-width: 900px;
-}
-
-/* Sizers are measurement-only: invisible, and ignored in list layout. */
-.grid__col-sizer,
-.grid__gutter-sizer {
-    height: 0;
-}
-
-/* Must match .grid__item width exactly: Masonry fits columns as
-   containerWidth / (colSizer + gutter), so a plain 50% here plus a gutter
-   overflows and collapses to a single column. */
-.grid__col-sizer {
-    width: calc(50% - 20px);
-}
-
-.grid__gutter-sizer {
-    width: 40px;
-}
-
-.grid .grid__item {
-    width: calc(50% - 20px);
-    margin-bottom: 40px;
-}
-
-.grid .grid__item img {
-    width: 100%;
-    display: block;
-}
-
-/* Avoid the load-then-jump flicker: hide until Masonry has measured.
-   The animation is a failsafe — if theme.js fails to load, the feed still
-   reveals itself after 3s rather than leaving a permanently blank page. */
-section.posts:not(.is-loaded) {
-    opacity: 0;
-    animation: reveal-failsafe 0s 3s forwards;
-}
-
-@keyframes reveal-failsafe {
-    to { opacity: 1; }
-}
-
-section.posts.is-loaded {
-    opacity: 1;
-    transition: opacity .3s ease;
-}
-
-/* -- post icons ------------------------------------------------------------ */
-
-/* Material Icons ship at 24px; scale to sit inline with post text. */
-.post-icon {
-    font-size: 1.15em;
-    vertical-align: middle;
-    line-height: 1;
-}
-
-/* Like button shows the outline heart until Tumblr marks the post liked. */
-.like-btn .solid-style {
-    display: none;
-}
-
-.like-btn.liked .outline-style {
-    display: none;
-}
-
-.like-btn.liked .solid-style {
-    display: inline;
-}
-
-/* -- layout toggle ------------------------------------------------------- */
-
-.layout-toggle {
-    display: inline-block;
-    padding: 0;
-    border: 0;
-    background: var(--primary-bg-color);
-    font-size: .8em;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    font-family: "Lato", sans-serif;
-    color: var(--muted-text-color);
-    cursor: pointer;
-}
-
-/* -- sidebar ------------------------------------------------------------ */
-
-#sidebar-left {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 275px;
-    padding: 150px 50px 50px 50px;
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-}
-
-#sidebar-left .title {
-    display: block;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 2.5px;
-    font: var(--heading-font);
-    color: var(--blog-title-color);
-}
-
-#sidebar-left .avatar {
-    display: block;
-    margin: 0 0 25px 0;
-    height: 40px;
-    width: 40px;
-    border-radius: 100%;
-}
-
-#sidebar-left .description {
-    margin-bottom: 25px;
-}
-
-#sidebar-right {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 275px;
-    padding: 150px 50px 50px 50px;
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-}
-
-/* -- nav ------------------------------------------------------------ */
-
-.menu li {
-    display: block;
-    position: relative;
-    margin-bottom: 5px;
-    list-style: none;
-}
-
-/* Dotted leader line behind each link; the link's own background masks it. */
-.menu li:before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    z-index: -1;
-    left: 0;
-    height: 0;
-    border-bottom: 1px dotted var(--border-color);
-    width: 100%;
-}
-
-.menu a {
-    display: inline-block;
-    font-size: .8em;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    font-family: "Lato", sans-serif;
-    color: var(--muted-text-color);
-    padding-right: 10px;
-    background: var(--primary-bg-color);
-}
-
-/* -- pagination ------------------------------------------------------------ */
-
-.pagination {
-    position: relative;
-    display: block;
-    margin: 50px 0 150px 375px;
-    padding: 50px 0 0 100px;
-    color: var(--muted-text-color);
-    border-top: 1px solid var(--border-color);
-    border-left: 1px solid var(--border-color);
-}
-
-.pagination a {
-    display: inline-block;
-    margin: 0 10px 0 0;
-    color: var(--muted-text-color);
-}
-
-/* -- post titles ------------------------------------------------------------ */
-
-.post-title {
-    color: var(--title-color);
-    font: var(--heading-font);
-    position: relative;
-    text-transform: uppercase;
-    letter-spacing: 2.5px;
-    font-weight: 600;
-}
-
-.post-title a {
-    color: var(--title-color);
-}
-
-/* -- tags ------------------------------------------------------------ */
-
-.tagscont a {
-    color: var(--muted-text-color);
-    margin-right: 5px;
-    display: inline;
-}
-
-.tagscont a:after {
-    content: ',';
-}
-
-.tagscont a:last-of-type {
-    margin-right: 0;
-}
-
-.tagscont a:last-of-type::after {
-    display: none;
-}
-
-/* -- reblog trail & notes (Tumblr-generated markup via {PostNotes}) ---------
-   These class names are Tumblr's own, not this theme's, so ref.html's rules
-   for them port over unchanged. */
-
-.comment {
-    margin: 0;
-    padding: 0 0 10px 0;
-    border-top: 1px dotted var(--border-color);
-    list-style: none;
-}
-
-.comment a {
-    border-bottom: 1px solid var(--text-border-color);
-}
-
-.comment:first-of-type {
-    border: 0;
-}
-
-.comment:before,
-ol.notes li:before {
-    display: none;
-}
-
-.user {
-    border: 0 !important;
-    display: block;
-    margin-bottom: 10px;
-}
-
-/* The first trail entry is the original poster, already credited elsewhere. */
-article .comment:first-of-type .user {
-    display: none;
-}
-
-.comment .user:after {
-    content: ' commented:';
-}
-
-.comment:last-of-type {
-    padding-bottom: 0;
-}
-
-/* -- responsive ------------------------------------------------------------ */
-
-@media (max-width: 700px) {
-    #sidebar-left,
-    #sidebar-right {
-        position: static;
-        width: auto;
-        max-height: none;
-        padding: 50px 25px 25px 25px;
-    }
-
-    section.posts {
-        margin: 0 25px;
-    }
-
-    .grid__col-sizer {
-        width: 100%;
-    }
-
-    .grid__gutter-sizer {
-        width: 0;
-    }
-
-    .grid .grid__item {
-        width: 100%;
-    }
-
-    .pagination {
-        margin: 50px 25px;
-        padding: 25px 0 0 0;
-    }
 }

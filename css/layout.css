@@ -1,0 +1,152 @@
+/* Page furniture: sidebars, nav, the posts container, the Masonry grid,
+   the layout toggle, pagination, and all responsive rules. */
+
+/* -- sidebar ------------------------------------------------------------ */
+
+#sidebar-left,
+#sidebar-right {
+    position: fixed;
+    top: 0;
+    width: 275px;
+    padding: 150px 50px 50px 50px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+#sidebar-left {
+    left: 0;
+}
+
+#sidebar-right {
+    right: 0;
+}
+
+#sidebar-left .title {
+    display: block;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    font: var(--heading-font);
+    color: var(--blog-title-color);
+}
+
+#sidebar-left .avatar {
+    display: block;
+    margin: 0 0 25px 0;
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+}
+
+#sidebar-left .description {
+    margin-bottom: 25px;
+}
+
+/* -- nav ------------------------------------------------------------ */
+
+.menu li {
+    display: block;
+    position: relative;
+    margin-bottom: 5px;
+    list-style: none;
+}
+
+/* Dotted leader behind each link; the link's own background masks it. */
+.menu li:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    z-index: -1;
+    left: 0;
+    height: 0;
+    border-bottom: 1px dotted var(--border-color);
+    width: 100%;
+}
+
+.menu a,
+.layout-toggle {
+    display: inline-block;
+    font-size: .8em;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-family: "Lato", sans-serif;
+    color: var(--muted-text-color);
+    padding-right: 10px;
+    background: var(--primary-bg-color);
+}
+
+.layout-toggle {
+    padding-left: 0;
+    border: 0;
+    cursor: pointer;
+}
+
+/* -- grid ------------------------------------------------------------ */
+
+/* Sizers are measurement-only: invisible, and ignored in list layout. */
+.grid__col-sizer,
+.grid__gutter-sizer {
+    height: 0;
+}
+
+/* Must match .grid__item width exactly: Masonry fits columns as
+   containerWidth / (colSizer + gutter), so a plain 50% here plus a gutter
+   overflows and collapses to a single column. */
+.grid__col-sizer {
+    width: calc(50% - 20px);
+}
+
+.grid__gutter-sizer {
+    width: 40px;
+}
+
+.grid .grid__item {
+    width: calc(50% - 20px);
+    margin-bottom: 40px;
+}
+
+.grid .grid__item img {
+    width: 100%;
+    display: block;
+}
+
+/* Avoid the load-then-jump flicker: hide until Masonry has measured.
+   The animation is a failsafe — if theme.js fails to load, the feed still
+   reveals itself after 3s rather than leaving a permanently blank page. */
+section.posts:not(.is-loaded) {
+    opacity: 0;
+    animation: reveal-failsafe 0s 3s forwards;
+}
+
+@keyframes reveal-failsafe {
+    to { opacity: 1; }
+}
+
+section.posts.is-loaded {
+    opacity: 1;
+    transition: opacity .3s ease;
+}
+
+/* -- responsive ------------------------------------------------------------ */
+
+@media (max-width: 700px) {
+    #sidebar-left,
+    #sidebar-right {
+        position: static;
+        width: auto;
+        max-height: none;
+        padding: 50px 25px 25px 25px;
+    }
+
+    .grid__col-sizer {
+        width: 100%;
+    }
+
+    .grid__gutter-sizer {
+        width: 0;
+    }
+
+    .grid .grid__item {
+        width: 100%;
+    }
+}

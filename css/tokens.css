@@ -1,0 +1,35 @@
+/* Design tokens. The single place to change the palette or typeface.
+   Must be linked before every other stylesheet. */
+
+:root {
+    /* -- color ----------------------------------------------------------- */
+
+    --primary-bg-color: #ffffff;
+    --primary-text-color: #111111;
+    --title-color: #000000;
+    --blog-title-color: #000000;
+    --link-hover-color: #f08dbd;
+    --border-color: #f5f5f5;
+    --text-border-color: #eeeeee;
+    --scrollbar-color: #d5d5d5;
+
+    /* Muted text is the RGB of --primary-text-color at 60%. If you change
+       --primary-text-color, change these two to match. */
+    --muted-text-color: rgba(17, 17, 17, .6);
+    --quiet-text-color: rgba(17, 17, 17, .75);
+
+    /* -- type ------------------------------------------------------------ */
+
+    --body-font: normal .95em/1.6em "Lora", georgia, serif;
+    --heading-font: 600 .8em/1.25em "Lato", sans-serif;
+
+    /* -- metrics --------------------------------------------------------- */
+
+    /* Width of a post in one-column (list) layout. Grid layout ignores this
+       and uses calc(50% - 20px) so Masonry can measure it. */
+    --post-width: 500px;
+
+    /* Left offset clearing the fixed sidebar, and the rail inset inside it. */
+    --feed-offset: 375px;
+    --rail-inset: 100px;
+}
