@@ -230,6 +230,84 @@ section.posts.is-loaded {
     color: var(--muted-text-color);
 }
 
+/* -- post titles ------------------------------------------------------------ */
+
+.post-title {
+    color: var(--title-color);
+    font: var(--heading-font);
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    font-weight: 600;
+}
+
+.post-title a {
+    color: var(--title-color);
+}
+
+/* -- tags ------------------------------------------------------------ */
+
+.tagscont a {
+    color: var(--muted-text-color);
+    margin-right: 5px;
+    display: inline;
+}
+
+.tagscont a:after {
+    content: ',';
+}
+
+.tagscont a:last-of-type {
+    margin-right: 0;
+}
+
+.tagscont a:last-of-type::after {
+    display: none;
+}
+
+/* -- reblog trail & notes (Tumblr-generated markup via {PostNotes}) ---------
+   These class names are Tumblr's own, not this theme's, so ref.html's rules
+   for them port over unchanged. */
+
+.comment {
+    margin: 0;
+    padding: 0 0 10px 0;
+    border-top: 1px dotted var(--border-color);
+    list-style: none;
+}
+
+.comment a {
+    border-bottom: 1px solid var(--text-border-color);
+}
+
+.comment:first-of-type {
+    border: 0;
+}
+
+.comment:before,
+ol.notes li:before {
+    display: none;
+}
+
+.user {
+    border: 0 !important;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* The first trail entry is the original poster, already credited elsewhere. */
+article .comment:first-of-type .user {
+    display: none;
+}
+
+.comment .user:after {
+    content: ' commented:';
+}
+
+.comment:last-of-type {
+    padding-bottom: 0;
+}
+
 /* -- responsive ------------------------------------------------------------ */
 
 @media (max-width: 700px) {
