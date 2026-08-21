@@ -8,6 +8,52 @@
 
 **Tech Stack:** Vanilla HTML/CSS/JS, Tumblr classic theme templating, Masonry v4 (self-hosted), imagesLoaded (self-hosted), no build step, no test framework (plain Node `assert` used for the one pure function that needs it).
 
+## Progress
+
+**Tasks 1–3 are complete and committed** (branch `base-grid`, through commit `b1b9727`).
+**Resume at Task 4.**
+
+Verified working in a real browser before the harness was removed: home → 2-column grid,
+catalog tag → 2-column grid, narrative tag → one column, mobile (375px) → one column with the
+sidebar unpinned. Toggle switches layout, updates its label, persists per bucket, and does not
+leak across buckets. Masonry is destroyed (not just hidden) when switching to list.
+
+### Deviations from the plan as written — read before continuing
+
+1. **`.posts` selectors must be element-qualified.** `theme.html` puts `class="posts"` on *both*
+   the `<section>` and every `<article>`. The plan's bare `.posts { opacity: 0 }` would have
+   hidden every post permanently. All such rules now use `section.posts`. Watch for this in
+   Tasks 5–6.
+2. **Masonry column sizer must equal item width.** Masonry fits columns as
+   `containerWidth / (colSizer + gutter)`. The plan's `50%` sizer plus a 40px gutter overflowed and
+   silently collapsed the grid to one column. `.grid__col-sizer` is now `calc(50% - 20px)`,
+   matching `.grid__item`. If you change the column count, change both together.
+3. **Added a CSS reveal failsafe.** The feed is `opacity: 0` until JS adds `.is-loaded`, so a
+   failed `theme.js` request would have rendered the blog permanently blank. A
+   `reveal-failsafe` keyframe animation now reveals it after 3s regardless.
+4. **`mageicons` never existed in this theme** — the post markup was ported from `ref3.html`,
+   which loads it from `//mage-icons.gitlab.io/i/icons.min.css`, but that link was never added
+   here. All six icons rendered as nothing. Replaced with Material Icons (already linked in
+   `<head>`, so no new dependency): `push_pin`, `notes`, `tag`, `repeat`, `favorite_border`,
+   `favorite`. **`notes` and `repeat` are semantic guesses** — the originals were never visible.
+   Worth an eyeball in Tumblr's preview.
+5. **Local preview harness was built, then removed at the user's request.** Tasks 5–6 are pure CSS
+   on post chrome with no local way to see the result — verification means pasting `theme.html`
+   into Tumblr's Customize → Edit HTML preview. If that becomes tedious, rebuilding
+   `dev/preview.html` is a reasonable call (it loaded the real `css/base.css` and `js/theme.js`
+   against placeholder posts, with URL params to switch page kind).
+
+### Known issues not yet fixed
+
+- **`css/base.css:13` has `font-size:{select:font size};`** — Tumblr template syntax in an
+  external stylesheet. Tumblr only substitutes template tags inside `theme.html`; the CSS is
+  fetched straight from GitHub Pages, so this is never replaced and the declaration is dropped.
+  The `font:` shorthand below it sets size anyway, but that customizer control does nothing today.
+  Fold into Task 5.
+- **`.like-btn.liked` styling is unverified.** The outline→solid heart swap assumes Tumblr adds a
+  `liked` class to the button. Confirm in the live preview.
+- `{LikeButton}` and `Tumblr.Lightbox.init(...)` can only ever be tested inside Tumblr.
+
 ## Global Constraints
 
 - No new build tooling, package manager, or test framework — this repo has none today and the spec doesn't call for one.
@@ -21,7 +67,7 @@
 
 ---
 
-### Task 1: Remove Infinite Scroll, restore plain pagination, fix the imagesLoaded dependency
+### Task 1: Remove Infinite Scroll, restore plain pagination, fix the imagesLoaded dependency  ✅ DONE
 
 **Files:**
 - Modify: `theme.html:26` (remove `if:Infinite scroll` customizer option)
@@ -36,24 +82,24 @@
 
 **Context:** `js/theme.js` calls `imagesLoaded(grid, ...)`, but that global was only defined because it happened to be bundled inside `infinite-scroll.pkgd.min.js`. Removing Infinite Scroll without replacing that dependency will silently break the Masonry init (later tasks depend on this working). `masonry.pkgd.min.js` does NOT bundle `imagesLoaded` (verified: `grep -c imagesLoaded js/vendor/masonry.pkgd.min.js` returns 0).
 
-- [ ] **Step 1: Download the standalone imagesLoaded library**
+- [x] **Step 1: Download the standalone imagesLoaded library**
 
 ```bash
 cd /Users/kate/projects/simblr/js/vendor && curl -fsSL -o imagesloaded.pkgd.min.js https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js
 ```
 
-- [ ] **Step 2: Verify the download**
+- [x] **Step 2: Verify the download**
 
 Run: `head -c 200 /Users/kate/projects/simblr/js/vendor/imagesloaded.pkgd.min.js`
 Expected: starts with a comment block naming "imagesLoaded PACKAGED" (mirrors the header style of the other two vendor files already in this folder).
 
-- [ ] **Step 3: Delete the Infinite Scroll vendor file**
+- [x] **Step 3: Delete the Infinite Scroll vendor file**
 
 ```bash
 rm /Users/kate/projects/simblr/js/vendor/infinite-scroll.pkgd.min.js
 ```
 
-- [ ] **Step 4: Update the script tags in theme.html's `<head>`**
+- [x] **Step 4: Update the script tags in theme.html's `<head>`**
 
 Find (currently around line 54-56):
 ```html
@@ -69,7 +115,7 @@ Replace with:
         <script defer src="https://kate-j-xia.github.io/simblr/js/theme.js"></script>
 ```
 
-- [ ] **Step 5: Remove the now-unused "Infinite scroll" customizer option**
+- [x] **Step 5: Remove the now-unused "Infinite scroll" customizer option**
 
 Find (currently around line 26):
 ```html
@@ -78,7 +124,7 @@ Find (currently around line 26):
 
 Delete that line entirely.
 
-- [ ] **Step 6: Replace the pagination block**
+- [x] **Step 6: Replace the pagination block**
 
 Find the pagination section near the end of the posts loop (currently around lines 439-451):
 ```html
@@ -109,7 +155,7 @@ Replace with:
             </footer>
 ```
 
-- [ ] **Step 7: Remove the InfiniteScroll wiring from js/theme.js**
+- [x] **Step 7: Remove the InfiniteScroll wiring from js/theme.js**
 
 Find:
 ```javascript
@@ -126,12 +172,12 @@ let infScroll = new InfiniteScroll(
 
 Delete that block entirely (the closing lines of the file).
 
-- [ ] **Step 8: Verify theme.js still has valid syntax**
+- [x] **Step 8: Verify theme.js still has valid syntax**
 
 Run: `node --check /Users/kate/projects/simblr/js/theme.js`
 Expected: no output, exit code 0.
 
-- [ ] **Step 9: Verify theme.html block tags stay balanced**
+- [x] **Step 9: Verify theme.html block tags stay balanced**
 
 Run:
 ```bash
@@ -139,7 +185,7 @@ cd /Users/kate/projects/simblr && for tag in Posts PostNotes IndexPage TagPage P
 ```
 Expected: `open` equals `close` for every tag listed.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add theme.html js/theme.js js/vendor/imagesloaded.pkgd.min.js && git rm js/vendor/infinite-scroll.pkgd.min.js && git commit -m "Replace infinite scroll with numbered pagination, self-host imagesLoaded"
@@ -147,7 +193,7 @@ cd /Users/kate/projects/simblr && git add theme.html js/theme.js js/vendor/image
 
 ---
 
-### Task 2: Fix the root-url attribute bug and add a data-tags attribute for dedup
+### Task 2: Fix the root-url attribute bug and add a data-tags attribute for dedup  ✅ DONE
 
 **Files:**
 - Modify: `theme.html` (article opening tag, currently line 117-126 — reread at execution time since Task 1 shifted line numbers)
@@ -157,7 +203,7 @@ cd /Users/kate/projects/simblr && git add theme.html js/theme.js js/vendor/image
 
 **Context:** The current `root-url` attribute has mismatched block tags — `{block:NotReblog}` is opened twice and never closed, which is invalid Tumblr templating and breaks the intended "trace to original post" behavior needed for dedup matching.
 
-- [ ] **Step 1: Fix the root-url attribute and add data-tags**
+- [x] **Step 1: Fix the root-url attribute and add data-tags**
 
 Find (current article opening tag):
 ```html
@@ -189,7 +235,7 @@ Note: the `class="posts grid__item"` part of this block is rewritten by Task 3 �
                 >
 ```
 
-- [ ] **Step 2: Verify block tags stay balanced**
+- [x] **Step 2: Verify block tags stay balanced**
 
 Run:
 ```bash
@@ -197,7 +243,7 @@ cd /Users/kate/projects/simblr && for tag in NotReblog RebloggedFrom HasTags Tag
 ```
 Expected: `open` equals `close` for every tag listed.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add theme.html && git commit -m "Fix root-url block tags and add data-tags attribute for repost dedup"
@@ -205,7 +251,7 @@ cd /Users/kate/projects/simblr && git add theme.html && git commit -m "Fix root-
 
 ---
 
-### Task 3: Layout resolution, reader toggle, and responsive columns
+### Task 3: Layout resolution, reader toggle, and responsive columns  ✅ DONE
 
 **Files:**
 - Modify: `theme.html` (page-kind attributes on the posts section, toggle button in sidebar, remove hardcoded grid classes)
@@ -223,7 +269,7 @@ cd /Users/kate/projects/simblr && git add theme.html && git commit -m "Fix root-
 
 **Context:** The grid classes are currently hardcoded on in `theme.html` from an earlier session. This task makes them JS-driven instead, since the layout now depends on stored preferences that only JS can read. To avoid a flash of the wrong layout, the sizer elements always render (they're invisible, zero-height) and only the `.grid` / `.grid__item` classes toggle.
 
-- [ ] **Step 1: Replace the posts section opening with page-kind attributes**
+- [x] **Step 1: Replace the posts section opening with page-kind attributes**
 
 Find:
 ```html
@@ -249,7 +295,7 @@ Replace with:
 
 Note: Tumblr treats a tag page as *also* being an index page, so `{block:IndexPage}` cannot distinguish home from tag and is deliberately not used here. Only the two unambiguous cases emit a value; an empty `data-page-kind` means "home feed", which the JS in Step 3 treats as `'home'`.
 
-- [ ] **Step 2: Remove the hardcoded grid class from the article tag**
+- [x] **Step 2: Remove the hardcoded grid class from the article tag**
 
 Find:
 ```html
@@ -265,7 +311,7 @@ Replace with:
                     id="post-{PostID}"
 ```
 
-- [ ] **Step 3: Add the layout toggle button to the sidebar**
+- [x] **Step 3: Add the layout toggle button to the sidebar**
 
 Find (in `#sidebar-left`, just before the closing `</nav>`):
 ```html
@@ -282,7 +328,7 @@ Replace with:
 
 The button starts `hidden` and is revealed by JS, so visitors with JS disabled never see a control that does nothing. `{block:IndexPage}` covers both the home feed and tag pages (Tumblr counts tag pages as index pages) while excluding permalink pages, which have no layout to toggle.
 
-- [ ] **Step 4: Write the failing tests for layout resolution**
+- [x] **Step 4: Write the failing tests for layout resolution**
 
 Create `js/theme.test.js` (or append to it if Task 4 ran first):
 ```javascript
@@ -319,12 +365,12 @@ assert.strictEqual(resolveLayout('narrative', { catalog: 'grid' }), 'list');
 console.log('layout tests passed');
 ```
 
-- [ ] **Step 5: Run the tests to verify they fail**
+- [x] **Step 5: Run the tests to verify they fail**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
 Expected: throws, because `getLayoutBucket` / `resolveLayout` are not exported yet.
 
-- [ ] **Step 6: Implement layout resolution and toggle wiring in js/theme.js**
+- [x] **Step 6: Implement layout resolution and toggle wiring in js/theme.js**
 
 Add near the top of `js/theme.js`, above the existing Masonry code:
 
@@ -377,7 +423,7 @@ function writeStoredLayout(bucket, layout) {
 }
 ```
 
-- [ ] **Step 7: Replace the Masonry block with a layout-aware version**
+- [x] **Step 7: Replace the Masonry block with a layout-aware version**
 
 Find the existing Masonry + imagesLoaded block (after Task 1's edits):
 ```javascript
@@ -476,17 +522,17 @@ if (typeof module !== 'undefined') {
 
 Note: if Task 4 already added a `module.exports` block, merge these keys into it rather than adding a second `module.exports` assignment (the later one would silently overwrite the earlier).
 
-- [ ] **Step 8: Run the tests to verify they pass**
+- [x] **Step 8: Run the tests to verify they pass**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
 Expected: prints `layout tests passed`, exit code 0.
 
-- [ ] **Step 9: Verify theme.js syntax**
+- [x] **Step 9: Verify theme.js syntax**
 
 Run: `node --check /Users/kate/projects/simblr/js/theme.js`
 Expected: no output, exit code 0.
 
-- [ ] **Step 10: Add the grid, responsive, and toggle CSS**
+- [x] **Step 10: Add the grid, responsive, and toggle CSS**
 
 Replace the empty `/* -- grid --- */` section at the bottom of `css/base.css` with:
 ```css
@@ -582,11 +628,11 @@ Replace the empty `/* -- grid --- */` section at the bottom of `css/base.css` wi
 
 Note: this depends on `--muted-text-color`, defined in Task 5. If executing strictly in order, the toggle text will fall back to inheriting until Task 5 lands — harmless, and resolved once Task 5 runs.
 
-- [ ] **Step 11: Manual verification**
+- [x] **Step 11: Manual verification**
 
 In Tumblr's live preview: home feed defaults to a 2-column grid; a legacy tag page (using a tag from `NARRATIVE_TAGS`) defaults to one column; a builds tag page defaults to grid. Click the sidebar toggle on each — layout switches immediately, and the label updates. Reload: the toggled choice persists. Toggle grid on a catalog tag, then visit a narrative tag — it should still be one column (per-bucket memory). Narrow the browser under 700px: grid collapses to a single column and sidebars stack above the feed.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add theme.html js/theme.js js/theme.test.js css/base.css && git commit -m "Add per-page-kind layout resolution with reader toggle and responsive grid"
