@@ -17,25 +17,55 @@ theme vs. this project's split `css/`/`js`/`theme.html`).
 
 ## 1. Page architecture & pagination
 
-- **Home (`{block:IndexPage}`)**: single-post-at-a-time, as already built. No Masonry, no grid
-  classes here.
-- **Tag pages (`{block:TagPage}`)**: any `/tagged/...` URL. Same `theme.html`, but switches to
-  Masonry grid layout via a `{block:TagPage}` conditional on the posts container's classes.
-  Tumblr filters posts to the tag automatically — no separate custom page needed per tag/category.
-- **Pagination**: classic `{block:PreviousPage}` / `{block:NextPage}` links (already present in
-  the markup) everywhere, full page load on click. No infinite scroll anywhere in the theme.
-  Reason: the InfiniteScroll library's `history` option only cosmetically rewrites the URL as you
-  scroll — it doesn't produce real separate pages or reliably restore scroll position on
-  back-navigation, which was the specific pain point (losing position while hunting through
-  downloads).
-- **Consequence for existing code**: this reverses part of an earlier "quick fix" pass.
-  - `js/theme.js` should be simplified: keep Masonry (still needed for tag-page grids), drop the
-    `InfiniteScroll(...)` wiring entirely.
-  - `theme.html`: the `.grid` / `.grid__item` / sizer classes currently added unconditionally to
-    the posts loop need to move behind a `{block:TagPage}` check instead of wrapping every post.
-  - `.pagination__next` / `.page-load-status` classes added for InfiniteScroll's `path`/`status`
-    hooks are no longer needed and should be removed along with the InfiniteScroll vendor script
-    tag and `js/vendor/infinite-scroll.pkgd.min.js`.
+**Organizing principle**: layout follows *content type*, not page location. Catalog-style content
+(builds, downloads, screenshots) benefits from grid — density, "vibe at a glance", fast scanning.
+Narrative content (legacies, playthroughs, family tags) benefits from one column — sequential,
+detail matters, missing a post is actually bad. Both layouts stay available everywhere via a
+reader toggle, because the preference is also mood-dependent.
+
+**Page kinds and default layout:**
+
+| Page kind | Which pages | Default layout |
+|---|---|---|
+| `home` | `{block:IndexPage}` | grid |
+| `narrative` | tag pages whose tag is in a hardcoded narrative list (legacies, family tags) | one column |
+| `catalog` | all other tag pages | grid |
+| `permalink` | `{block:PermalinkPage}` — single post | one column, no toggle |
+
+**Reader toggle**: a grid/list toggle control in the sidebar on any multi-post page. The toggle
+sets an *override* stored in `localStorage`, remembered **per page kind** — independent keys for
+`home`, `narrative`, and `catalog`. Toggling to grid while browsing builds therefore does not also
+flatten legacies. When no override is stored for the current page kind, the default from the table
+above applies, so a visitor who never touches the toggle sees the intended design.
+
+Because the narrative tag list only decides a *default* (not a hard rule), forgetting to add a new
+legacy tag to it degrades gracefully — that tag page just defaults to grid and can still be
+toggled.
+
+**Grid density**: 2 columns on desktop, 1 column below a ~700px breakpoint. Column width lives in
+CSS on the `.grid__col-sizer` element (`50%` / `100%`), which Masonry measures — so mobile needs no
+separate layout, and Masonry's built-in resize listener handles rotation/resize. Rationale for 2
+rather than the more common 3–4: dense grids are what made grid feel "overwhelming" and
+"impersonal" — at 2 columns each post keeps real presence while still giving overview.
+
+**Pagination**: classic `{block:PreviousPage}` / `{block:NextPage}` links (already present in
+the markup) everywhere, full page load on click. No infinite scroll anywhere in the theme.
+Reason: the InfiniteScroll library's `history` option only cosmetically rewrites the URL as you
+scroll — it doesn't produce real separate pages or reliably restore scroll position on
+back-navigation, which was the specific pain point (losing position while hunting through
+downloads).
+
+**Known bug, explicitly not a design input**: the grid "glitch" (posts rendering, then jumping as
+images load and Masonry re-measures) is a load-order problem, not a reason to avoid grid. Handled
+by the `imagesLoaded` wiring — lay out after images resolve, fade in once settled.
+
+**Consequence for existing code**: this reverses part of an earlier "quick fix" pass.
+- `js/theme.js` should be simplified: keep Masonry, drop the `InfiniteScroll(...)` wiring entirely.
+- `theme.html`: the `.grid` / `.grid__item` / sizer classes currently added unconditionally to
+  the posts loop become driven by the resolved layout rather than hardcoded on.
+- `.pagination__next` / `.page-load-status` classes added for InfiniteScroll's `path`/`status`
+  hooks are no longer needed and should be removed along with the InfiniteScroll vendor script
+  tag and `js/vendor/infinite-scroll.pkgd.min.js`.
 
 ## 2. Duplicate-repost handling
 
@@ -75,8 +105,9 @@ native tag pages rather than embedding post content directly:
   links to Builds, Legacies, Worlds, specific families, etc. as tagged
   (e.g. `/tagged/ts2-builds`, `/tagged/ts2-legacy-<familyname>`).
 
-Adding a new category later is "add a link + tag consistently" — no new page files, no new theme
-code beyond the one shared `{block:TagPage}` grid-mode switch from §1.
+Adding a new category later is "add a link + tag consistently" — no new page files, and no new
+theme code beyond the shared layout-resolution logic from §1. If the new category is narrative
+(a new legacy or family), also add its tag to the narrative list so it defaults to one column.
 
 **Sidebar listing**: already handled by existing markup — `theme.html` line ~87 has
 `{block:HasPages}{block:Pages}<li><a href="{URL}">{Label}</a></li>{/block:Pages}{/block:HasPages}`,
@@ -106,10 +137,13 @@ file wholesale:
 the dark/light toggle mechanism. `ref.html` has toggle code, but which reference's approach to
 actually implement is a future decision.
 
+**Layout toggle vs. dark mode toggle**: these are two separate controls that will both live in the
+sidebar. The layout toggle (§1) is in scope now; the dark/light toggle is not. They should share a
+consistent visual treatment and `localStorage` convention when dark mode is built.
+
 ## Open items for implementation planning
 
 - Fix the `root-url` attribute's mismatched `{block:NotReblog}` tags (blocking §2).
-- Decide exact CSS selectors/BEM-ish naming for the `{block:TagPage}` grid-mode switch so it
-  doesn't collide with home-feed post styling.
+- Populate the initial narrative tag list (§1) with the real legacy/family tags currently in use.
 - `work-docs/GETTING_STARTED.md` should be updated to reflect this design (stale "Decisions made
   so far" and "Next steps" sections) once implementation starts.

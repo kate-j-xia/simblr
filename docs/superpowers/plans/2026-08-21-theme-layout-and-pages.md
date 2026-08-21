@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make the home feed single-post-only, move grid layout to Tumblr tag pages, replace infinite scroll with numbered pagination, add opt-in repost dedup, port `ref.html`'s visual design into `css/base.css`, and write the two custom pages (downloads, nav).
+**Goal:** Give the theme a content-type-driven layout (2-column grid for catalog content, one column for narrative content) with a reader toggle, replace infinite scroll with numbered pagination, add opt-in repost dedup, port `ref.html`'s visual design into `css/base.css`, and write the two custom pages (downloads, nav).
 
-**Architecture:** `theme.html` stays the single template for both the index (`{block:IndexPage}`, single-post) and tag pages (`{block:TagPage}`, Masonry grid), switching via conditional classes. `js/theme.js` gets a dedup pass (removes true-duplicate reposts, opt-in via a `superseded` tag) followed by a Masonry init that only runs when a `.grid` container is present. `css/base.css` absorbs `ref.html`'s ported palette/typography/chrome. `pages/downloads.html` and `pages/nav.html` become static link directories into Tumblr's native tag pages — no new custom page code needed per category.
+**Architecture:** `theme.html` stays the single template for every view; it emits `data-page-kind` / `data-tag` on the posts section and lets `js/theme.js` resolve the layout. Resolution is two pure, unit-tested functions: `getLayoutBucket()` maps page kind + tag to `home`/`narrative`/`catalog`/`permalink`, and `resolveLayout()` picks grid-vs-list from a `localStorage` override or the bucket's default. A sidebar toggle writes that override per bucket. On each page load `js/theme.js` runs dedup first (removes reposts tagged `superseded` when a newer duplicate exists), then applies the layout, initializing or destroying Masonry accordingly. `css/base.css` absorbs `ref.html`'s ported palette/typography/chrome and owns the column count (including the mobile collapse to 1 column). `pages/downloads.html` and `pages/nav.html` become static link directories into Tumblr's native tag pages — no new custom page code needed per category.
 
 **Tech Stack:** Vanilla HTML/CSS/JS, Tumblr classic theme templating, Masonry v4 (self-hosted), imagesLoaded (self-hosted), no build step, no test framework (plain Node `assert` used for the one pure function that needs it).
 
@@ -15,6 +15,9 @@
 - `css/base.css` custom properties follow the existing naming style already in the file (`--primary-bg-color`, `--primary-text-color`) — lowercase, hyphenated, `--<subject>-color` for colors.
 - Ported CSS must target this project's actual class names in `theme.html`, not `ref.html`'s class names, except where `ref.html` targets Tumblr's own generated markup (e.g. `{PostNotes}` output: `.comment`, `.user`, `ol.notes li`, etc.) — those class names are Tumblr's, not `ref.html`'s, and apply unchanged since this project also outputs `{PostNotes}` raw.
 - Every markup change must keep `theme.html` valid Tumblr templating (balanced `{block:X}`/`{/block:X}` tags).
+- Grid is 2 columns on desktop, 1 below 700px. Column width is set in CSS on `.grid__col-sizer` (never hardcoded in JS), since Masonry measures that element.
+- Layout defaults by page kind: home → grid, catalog tag → grid, narrative tag → list, permalink → list. Reader overrides persist per page kind under the single `localStorage` key `simblr-layout`.
+- All `localStorage` access must be wrapped in try/catch — it throws in private browsing on some browsers, and a theme that white-screens there is worse than one that forgets a preference.
 
 ---
 
@@ -202,17 +205,25 @@ cd /Users/kate/projects/simblr && git add theme.html && git commit -m "Fix root-
 
 ---
 
-### Task 3: Make grid layout conditional on tag pages only
+### Task 3: Layout resolution, reader toggle, and responsive columns
 
 **Files:**
-- Modify: `theme.html` (posts section opening, article class, currently lines 112-126 — reread at execution time)
-- Modify: `js/theme.js` (Masonry init, guard on grid presence)
+- Modify: `theme.html` (page-kind attributes on the posts section, toggle button in sidebar, remove hardcoded grid classes)
+- Modify: `js/theme.js` (layout resolution, toggle wiring, Masonry lifecycle)
+- Modify: `js/theme.test.js` (add layout-resolution tests — file is created in Task 4; if executing tasks in order, create it here instead and Task 4 appends to it)
+- Modify: `css/base.css` (grid columns, responsive breakpoint, toggle button)
 
 **Interfaces:**
-- Consumes: nothing new from earlier tasks.
-- Produces: `.grid` / `.grid__item` classes and the two sizer `<div>`s now only render when `{block:TagPage}` is true. `js/theme.js`'s Masonry init only runs when `document.querySelector('.grid')` finds an element — home page (`{block:IndexPage}`) renders single-post with no grid classes and does not run Masonry.
+- Consumes: nothing from earlier tasks.
+- Produces:
+  - `getLayoutBucket(pageKind, tag, narrativeTags)` — pure. Returns `'home' | 'narrative' | 'catalog' | 'permalink'`. A `pageKind` of `'tag'` resolves to `'narrative'` when `tag` is in `narrativeTags`, else `'catalog'`.
+  - `resolveLayout(bucket, stored)` — pure. Returns `'grid' | 'list'`. `stored` is the parsed `localStorage` object (or `null`). Returns `stored[bucket]` when set, else the bucket default: `home` → grid, `catalog` → grid, `narrative` → list, `permalink` → list.
+  - `LAYOUT_STORAGE_KEY` — the `localStorage` key name (`'simblr-layout'`), holding a JSON object mapping bucket → `'grid' | 'list'`.
+  - The posts `<section>` carries `data-page-kind` and `data-tag`; the resolved layout is applied as a `.grid` class on that section (plus `.grid__item` on each article) so CSS and Masonry both key off the same signal.
 
-- [ ] **Step 1: Make the posts section and sizers conditional**
+**Context:** The grid classes are currently hardcoded on in `theme.html` from an earlier session. This task makes them JS-driven instead, since the layout now depends on stored preferences that only JS can read. To avoid a flash of the wrong layout, the sizer elements always render (they're invisible, zero-height) and only the `.grid` / `.grid__item` classes toggle.
+
+- [ ] **Step 1: Replace the posts section opening with page-kind attributes**
 
 Find:
 ```html
@@ -225,16 +236,20 @@ Find:
 
 Replace with:
 ```html
-            <section class="posts{block:TagPage} grid{/block:TagPage}">
-                {block:TagPage}
+            <section
+                class="posts"
+                data-page-kind="{block:TagPage}tag{/block:TagPage}{block:PermalinkPage}permalink{/block:PermalinkPage}"
+                data-tag="{block:TagPage}{Tag}{/block:TagPage}"
+            >
                 <div class="grid__col-sizer"></div>
                 <div class="grid__gutter-sizer"></div>
-                {/block:TagPage}
 
                 {block:Posts}
 ```
 
-- [ ] **Step 2: Make the article class conditional**
+Note: Tumblr treats a tag page as *also* being an index page, so `{block:IndexPage}` cannot distinguish home from tag and is deliberately not used here. Only the two unambiguous cases emit a value; an empty `data-page-kind` means "home feed", which the JS in Step 3 treats as `'home'`.
+
+- [ ] **Step 2: Remove the hardcoded grid class from the article tag**
 
 Find:
 ```html
@@ -246,13 +261,125 @@ Find:
 Replace with:
 ```html
                 <article
-                    class="posts{block:TagPage} grid__item{/block:TagPage}"
+                    class="posts"
                     id="post-{PostID}"
 ```
 
-- [ ] **Step 3: Guard the Masonry init in js/theme.js on grid presence**
+- [ ] **Step 3: Add the layout toggle button to the sidebar**
 
-Find the top of `js/theme.js` (after Task 1's edits, this is now just the Masonry + imagesLoaded block):
+Find (in `#sidebar-left`, just before the closing `</nav>`):
+```html
+                    {block:ifLink6}<li><a href="{text:link 6 url}">{text:link 6}</a></li>{/block:ifLink6}
+                </nav>
+```
+
+Replace with:
+```html
+                    {block:ifLink6}<li><a href="{text:link 6 url}">{text:link 6}</a></li>{/block:ifLink6}
+                    {block:IndexPage}<li><button type="button" class="layout-toggle" hidden>grid view</button></li>{/block:IndexPage}
+                </nav>
+```
+
+The button starts `hidden` and is revealed by JS, so visitors with JS disabled never see a control that does nothing. `{block:IndexPage}` covers both the home feed and tag pages (Tumblr counts tag pages as index pages) while excluding permalink pages, which have no layout to toggle.
+
+- [ ] **Step 4: Write the failing tests for layout resolution**
+
+Create `js/theme.test.js` (or append to it if Task 4 ran first):
+```javascript
+const assert = require('assert');
+const {
+    getLayoutBucket,
+    resolveLayout,
+} = require('./theme.js');
+
+const NARRATIVE = ['ts2-legacies', 'ts3-legacies'];
+
+// Page kind -> bucket.
+assert.strictEqual(getLayoutBucket('', '', NARRATIVE), 'home');
+assert.strictEqual(getLayoutBucket('permalink', '', NARRATIVE), 'permalink');
+assert.strictEqual(getLayoutBucket('tag', 'ts2-builds', NARRATIVE), 'catalog');
+assert.strictEqual(getLayoutBucket('tag', 'ts2-legacies', NARRATIVE), 'narrative');
+
+// Tag matching is case-insensitive, since Tumblr preserves the tag's display case.
+assert.strictEqual(getLayoutBucket('tag', 'TS2-Legacies', NARRATIVE), 'narrative');
+
+// Defaults when nothing is stored.
+assert.strictEqual(resolveLayout('home', null), 'grid');
+assert.strictEqual(resolveLayout('catalog', null), 'grid');
+assert.strictEqual(resolveLayout('narrative', null), 'list');
+assert.strictEqual(resolveLayout('permalink', null), 'list');
+
+// A stored override wins over the default.
+assert.strictEqual(resolveLayout('home', { home: 'list' }), 'list');
+assert.strictEqual(resolveLayout('narrative', { narrative: 'grid' }), 'grid');
+
+// Overrides are remembered per bucket and do not leak across buckets.
+assert.strictEqual(resolveLayout('narrative', { catalog: 'grid' }), 'list');
+
+console.log('layout tests passed');
+```
+
+- [ ] **Step 5: Run the tests to verify they fail**
+
+Run: `node /Users/kate/projects/simblr/js/theme.test.js`
+Expected: throws, because `getLayoutBucket` / `resolveLayout` are not exported yet.
+
+- [ ] **Step 6: Implement layout resolution and toggle wiring in js/theme.js**
+
+Add near the top of `js/theme.js`, above the existing Masonry code:
+
+```javascript
+const LAYOUT_STORAGE_KEY = 'simblr-layout';
+
+const NARRATIVE_TAGS = [
+    'ts2-legacies',
+    'ts3-legacies',
+];
+
+const LAYOUT_DEFAULTS = {
+    home: 'grid',
+    catalog: 'grid',
+    narrative: 'list',
+    permalink: 'list',
+};
+
+function getLayoutBucket(pageKind, tag, narrativeTags) {
+    if (pageKind === 'permalink') return 'permalink';
+    if (pageKind !== 'tag') return 'home';
+    const normalized = (tag || '').toLowerCase();
+    const isNarrative = narrativeTags.some(
+        (t) => t.toLowerCase() === normalized
+    );
+    return isNarrative ? 'narrative' : 'catalog';
+}
+
+function resolveLayout(bucket, stored) {
+    if (stored && stored[bucket]) return stored[bucket];
+    return LAYOUT_DEFAULTS[bucket];
+}
+
+function readStoredLayouts() {
+    try {
+        return JSON.parse(localStorage.getItem(LAYOUT_STORAGE_KEY)) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function writeStoredLayout(bucket, layout) {
+    const stored = readStoredLayouts();
+    stored[bucket] = layout;
+    try {
+        localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(stored));
+    } catch (e) {
+        /* private browsing — preference just won't persist */
+    }
+}
+```
+
+- [ ] **Step 7: Replace the Masonry block with a layout-aware version**
+
+Find the existing Masonry + imagesLoaded block (after Task 1's edits):
 ```javascript
 let grid = document.querySelector('.grid');
 let msnry = new Masonry(grid, {
@@ -275,49 +402,194 @@ imagesLoaded(
 
 Replace with:
 ```javascript
-let grid = document.querySelector('.grid');
+function initLayout() {
+    const section = document.querySelector('section.posts');
+    if (!section) return;
 
-if (grid) {
-    let msnry = new Masonry(grid, {
-        itemSelector: '.none',
-        columnWidth: '.grid__col-sizer',
-        gutter: '.grid__gutter-sizer',
-        percentPosition: true,
-        stagger: 30,
-    });
-
-    imagesLoaded(
-        grid, function() {
-            grid.classList.remove('are-images-unloaded');
-            msnry.options.itemSelector = '.grid__item';
-            let items = grid.querySelectorAll('.grid__item');
-            msnry.appended(items);
-        }
+    const bucket = getLayoutBucket(
+        section.dataset.pageKind,
+        section.dataset.tag,
+        NARRATIVE_TAGS
     );
+    if (bucket === 'permalink') return;
+
+    const articles = Array.from(section.querySelectorAll('article.posts'));
+    const toggle = document.querySelector('.layout-toggle');
+    let msnry = null;
+
+    function applyLayout(layout) {
+        if (layout === 'grid') {
+            section.classList.add('grid');
+            articles.forEach((a) => a.classList.add('grid__item'));
+            if (!msnry) {
+                msnry = new Masonry(section, {
+                    itemSelector: '.grid__item',
+                    columnWidth: '.grid__col-sizer',
+                    gutter: '.grid__gutter-sizer',
+                    percentPosition: true,
+                    stagger: 30,
+                });
+            }
+            imagesLoaded(section, function () {
+                section.classList.add('is-loaded');
+                msnry.layout();
+            });
+        } else {
+            if (msnry) {
+                msnry.destroy();
+                msnry = null;
+            }
+            section.classList.remove('grid');
+            articles.forEach((a) => a.classList.remove('grid__item'));
+            section.classList.add('is-loaded');
+        }
+
+        if (toggle) {
+            toggle.hidden = false;
+            toggle.textContent = layout === 'grid' ? 'list view' : 'grid view';
+        }
+    }
+
+    applyLayout(resolveLayout(bucket, readStoredLayouts()));
+
+    if (toggle) {
+        toggle.addEventListener('click', function () {
+            const next = section.classList.contains('grid') ? 'list' : 'grid';
+            writeStoredLayout(bucket, next);
+            applyLayout(next);
+        });
+    }
+}
+
+if (typeof document !== 'undefined') {
+    initLayout();
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        getLayoutBucket,
+        resolveLayout,
+        LAYOUT_STORAGE_KEY,
+    };
 }
 ```
 
-- [ ] **Step 4: Verify theme.js syntax**
+Note: if Task 4 already added a `module.exports` block, merge these keys into it rather than adding a second `module.exports` assignment (the later one would silently overwrite the earlier).
+
+- [ ] **Step 8: Run the tests to verify they pass**
+
+Run: `node /Users/kate/projects/simblr/js/theme.test.js`
+Expected: prints `layout tests passed`, exit code 0.
+
+- [ ] **Step 9: Verify theme.js syntax**
 
 Run: `node --check /Users/kate/projects/simblr/js/theme.js`
 Expected: no output, exit code 0.
 
-- [ ] **Step 5: Verify block tags stay balanced**
+- [ ] **Step 10: Add the grid, responsive, and toggle CSS**
 
-Run:
-```bash
-cd /Users/kate/projects/simblr && o=$(grep -o "{block:TagPage}" theme.html | wc -l); c=$(grep -o "{/block:TagPage}" theme.html | wc -l); echo "TagPage: open=$o close=$c"
+Replace the empty `/* -- grid --- */` section at the bottom of `css/base.css` with:
+```css
+/* -- grid ------------------------------------------------------------ */
+
+.posts {
+    margin: 0 0 0 375px;
+    max-width: 900px;
+}
+
+/* Sizers are measurement-only: invisible, and ignored in list layout. */
+.grid__col-sizer,
+.grid__gutter-sizer {
+    height: 0;
+}
+
+.grid__col-sizer {
+    width: 50%;
+}
+
+.grid__gutter-sizer {
+    width: 40px;
+}
+
+.grid .grid__item {
+    width: calc(50% - 20px);
+    margin-bottom: 40px;
+}
+
+.grid .grid__item img {
+    width: 100%;
+    display: block;
+}
+
+/* Avoid the load-then-jump flicker: hide until Masonry has measured. */
+.posts:not(.is-loaded) {
+    opacity: 0;
+}
+
+.posts.is-loaded {
+    opacity: 1;
+    transition: opacity .3s ease;
+}
+
+/* -- layout toggle ------------------------------------------------------- */
+
+.layout-toggle {
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    background: var(--primary-bg-color);
+    font-size: .8em;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-family: "Lato", sans-serif;
+    color: var(--muted-text-color);
+    cursor: pointer;
+}
+
+/* -- responsive ------------------------------------------------------------ */
+
+@media (max-width: 700px) {
+    #sidebar-left,
+    #sidebar-right {
+        position: static;
+        width: auto;
+        max-height: none;
+        padding: 50px 25px 25px 25px;
+    }
+
+    .posts {
+        margin: 0 25px;
+    }
+
+    .grid__col-sizer {
+        width: 100%;
+    }
+
+    .grid__gutter-sizer {
+        width: 0;
+    }
+
+    .grid .grid__item {
+        width: 100%;
+    }
+
+    .pagination {
+        margin: 50px 25px;
+        padding: 25px 0 0 0;
+    }
+}
 ```
-Expected: `open` equals `close`.
 
-- [ ] **Step 6: Manual verification**
+Note: this depends on `--muted-text-color`, defined in Task 5. If executing strictly in order, the toggle text will fall back to inheriting until Task 5 lands — harmless, and resolved once Task 5 runs.
 
-Paste the current `theme.html` into Tumblr's Customize → Edit HTML live preview. Confirm: the index page shows single-post layout with no grid classes in the rendered DOM (inspect element on a `.posts` article — should not have `grid__item`); visiting any `/tagged/...` URL on the blog shows the grid classes present and Masonry actually laying out tiles.
+- [ ] **Step 11: Manual verification**
 
-- [ ] **Step 7: Commit**
+In Tumblr's live preview: home feed defaults to a 2-column grid; a legacy tag page (using a tag from `NARRATIVE_TAGS`) defaults to one column; a builds tag page defaults to grid. Click the sidebar toggle on each — layout switches immediately, and the label updates. Reload: the toggled choice persists. Toggle grid on a catalog tag, then visit a narrative tag — it should still be one column (per-bucket memory). Narrow the browser under 700px: grid collapses to a single column and sidebars stack above the feed.
+
+- [ ] **Step 12: Commit**
 
 ```bash
-cd /Users/kate/projects/simblr && git add theme.html js/theme.js && git commit -m "Restrict Masonry grid layout to tag pages, keep home feed single-post"
+cd /Users/kate/projects/simblr && git add theme.html js/theme.js js/theme.test.js css/base.css && git commit -m "Add per-page-kind layout resolution with reader toggle and responsive grid"
 ```
 
 ---
@@ -325,18 +597,19 @@ cd /Users/kate/projects/simblr && git add theme.html js/theme.js && git commit -
 ### Task 4: Implement opt-in repost dedup
 
 **Files:**
-- Modify: `js/theme.js` (add dedup logic, run before Masonry init)
-- Test: `js/theme.test.js` (new — plain Node script using the built-in `assert` module, no framework)
+- Modify: `js/theme.js` (add dedup logic, run before layout init)
+- Modify: `js/theme.test.js` (append dedup tests; created in Task 3)
 
 **Interfaces:**
 - Produces: `getPostsToHide(posts)` — pure function. Input: array of `{ rootUrl: string, superseded: boolean }` objects in DOM order (Tumblr lists newest-first, so index 0 is the newest post). Output: a `Set<number>` of indices that should be removed. A post is only included if it's tagged `superseded` AND at least one other post sharing its `rootUrl` is NOT tagged `superseded` (guarantees at least one visible copy always survives, and a stray `superseded` tag with no matching duplicate on the page does nothing).
 - Consumes: `root-url` and `data-tags` attributes from Task 2.
 
+**Ordering requirement:** dedup must run *before* `initLayout()` from Task 3, so Masonry never measures posts that are about to be removed. Task 3's `initLayout()` snapshots `articles` once at init; removing DOM nodes afterward would leave stale references and a gap in the grid.
+
 - [ ] **Step 1: Write the failing test**
 
-Create `js/theme.test.js`:
+Append to `js/theme.test.js` (created in Task 3 — add this below the layout tests, reusing the existing `require`; add `getPostsToHide` to that destructured import rather than requiring the module twice):
 ```javascript
-const assert = require('assert');
 const { getPostsToHide } = require('./theme.js');
 
 // A stray "superseded" tag with no duplicate on the page does nothing.
@@ -381,17 +654,17 @@ assert.deepStrictEqual(
     new Set()
 );
 
-console.log('all tests passed');
+console.log('dedup tests passed');
 ```
 
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
-Expected: throws an error requiring/calling `getPostsToHide`, since it doesn't exist yet (and `theme.js` doesn't export anything yet).
+Expected: the layout tests still pass, then it throws on `getPostsToHide` not being exported yet.
 
-- [ ] **Step 3: Add the pure function and DOM wiring to the top of js/theme.js**
+- [ ] **Step 3: Add the pure function and DOM wiring to js/theme.js**
 
-Insert at the very top of `js/theme.js`, before the existing `let grid = ...` line:
+Insert into `js/theme.js` above Task 3's `initLayout()` definition:
 
 ```javascript
 function getPostsToHide(posts) {
@@ -426,20 +699,30 @@ function removeSupersededReposts() {
 
     getPostsToHide(posts).forEach((i) => articles[i].remove());
 }
+```
 
+Then update the two bottom blocks that Task 3 added, so dedup runs first and both functions are exported from a single `module.exports`:
+
+```javascript
 if (typeof document !== 'undefined') {
     removeSupersededReposts();
+    initLayout();
 }
 
 if (typeof module !== 'undefined') {
-    module.exports = { getPostsToHide };
+    module.exports = {
+        getLayoutBucket,
+        resolveLayout,
+        getPostsToHide,
+        LAYOUT_STORAGE_KEY,
+    };
 }
 ```
 
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
-Expected: prints `all tests passed`, exit code 0.
+Expected: prints `layout tests passed` then `dedup tests passed`, exit code 0.
 
 - [ ] **Step 5: Verify theme.js still has valid browser syntax**
 
@@ -868,14 +1151,22 @@ cd /Users/kate/projects/simblr && git add pages/nav.html && git commit -m "Write
 
 Find the `## 1a. Decisions made so far` section and replace its bullet list with:
 ```markdown
-- **Layout split**: home feed (`{block:IndexPage}`) is single-post-at-a-time. Grid/masonry layout
-  is scoped to Tumblr tag pages (`{block:TagPage}`) only — browsing `/tagged/...` URLs switches
-  the same `theme.html` template into grid mode via conditional classes. Long text posts don't
-  port well to grid tiles, which is why grid stayed off the home feed.
+- **Layout follows content type, not page location.** Catalog content (builds, downloads,
+  screenshots) defaults to a 2-column Masonry grid; narrative content (legacies, family tags)
+  defaults to one column. Defaults by page kind: home → grid, catalog tags → grid, narrative tags
+  → one column, permalink → one column. Narrative tags are listed in `NARRATIVE_TAGS` in
+  `js/theme.js` — add new legacy/family tags there, or they'll default to grid.
+- **Reader layout toggle**: sidebar button switches grid/list on any multi-post page, remembered
+  in `localStorage` **per page kind** (key `simblr-layout`), so choosing grid for downloads doesn't
+  also flatten legacies. The hardcoded narrative list only sets the *default*, never a hard rule.
+- **Grid density**: 2 columns desktop, 1 column under 700px. Column width lives in CSS on
+  `.grid__col-sizer`, which Masonry measures — no separate mobile layout. 2 rather than the usual
+  3–4 on purpose: dense grids read as overwhelming and impersonal.
 - **Grid technique**: Masonry v4 + imagesLoaded (both self-hosted in `js/vendor/`, downloaded from
-  unpkg.com). No infinite scroll anywhere — numbered `{block:PreviousPage}`/`{block:NextPage}`
-  links only, since infinite scroll's URL-rewrite didn't solve the "lose my scroll position"
-  problem it was meant to.
+  unpkg.com). The feed stays hidden until imagesLoaded fires, then fades in — this is what prevents
+  the load-then-jump flicker. No infinite scroll anywhere — numbered
+  `{block:PreviousPage}`/`{block:NextPage}` links only, since infinite scroll's URL-rewrite didn't
+  solve the "lose my scroll position" problem it was meant to.
 - **Repost dedup**: opt-in only. Tag an older, truly-superseded repost `superseded` and a JS pass
   removes it if a newer post shares its `root-url` attribute. No automatic hiding based on content
   matching, since some reposts of the same original carry genuinely different content.
@@ -902,7 +1193,8 @@ Find the `## 6. Next steps` section and replace its numbered list with:
    feels right.
 3. **Tag hygiene**: as you post, keep tagging consistently by game + category (`ts2-builds`,
    `ts3-downloads`, etc.) so `pages/nav.html` and `pages/downloads.html` stay accurate — add a new
-   `<li>` there whenever a new category/family gets its own tag.
+   `<li>` there whenever a new category/family gets its own tag, and add narrative tags to
+   `NARRATIVE_TAGS` in `js/theme.js` so they default to one column.
 4. **Polish**: cross-device check, screenshots, revisit border styling (flagged as a follow-up
    during the `ref.html` port), fill out a proper install doc.
 ```
