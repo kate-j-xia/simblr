@@ -10,8 +10,13 @@
 
 ## Progress
 
-**Tasks 1–3 are complete and committed** (branch `base-grid`, through commit `b1b9727`).
-**Resume at Task 4.**
+**Tasks 1–6 are complete and committed** (branch `base-grid`, through commit `65eeb55`).
+**Resume at Task 7.**
+
+Tasks 4–6 have **not been visually verified** — Task 4's Step 6 and Tasks 5–6's manual-verification
+steps all require pasting `theme.html` into Tumblr's Customize → Edit HTML preview, and the local
+preview harness was removed (see deviation 5). The dedup logic is unit-tested; the CSS is not
+verified at all.
 
 Verified working in a real browser before the harness was removed: home → 2-column grid,
 catalog tag → 2-column grid, narrative tag → one column, mobile (375px) → one column with the
@@ -45,7 +50,7 @@ leak across buckets. Masonry is destroyed (not just hidden) when switching to li
 
 ### Known issues not yet fixed
 
-- **`css/base.css:13` has `font-size:{select:font size};`** — Tumblr template syntax in an
+- ~~**`css/base.css:13` has `font-size:{select:font size};`**~~ — removed in Task 5. — Tumblr template syntax in an
   external stylesheet. Tumblr only substitutes template tags inside `theme.html`; the CSS is
   fetched straight from GitHub Pages, so this is never replaced and the declaration is dropped.
   The `font:` shorthand below it sets size anyway, but that customizer control does nothing today.
@@ -640,7 +645,7 @@ cd /Users/kate/projects/simblr && git add theme.html js/theme.js js/theme.test.j
 
 ---
 
-### Task 4: Implement opt-in repost dedup
+### Task 4: Implement opt-in repost dedup  ✅ DONE
 
 **Files:**
 - Modify: `js/theme.js` (add dedup logic, run before layout init)
@@ -652,7 +657,7 @@ cd /Users/kate/projects/simblr && git add theme.html js/theme.js js/theme.test.j
 
 **Ordering requirement:** dedup must run *before* `initLayout()` from Task 3, so Masonry never measures posts that are about to be removed. Task 3's `initLayout()` snapshots `articles` once at init; removing DOM nodes afterward would leave stale references and a gap in the grid.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `js/theme.test.js` (created in Task 3 — add this below the layout tests, reusing the existing `require`; add `getPostsToHide` to that destructured import rather than requiring the module twice):
 ```javascript
@@ -703,12 +708,12 @@ assert.deepStrictEqual(
 console.log('dedup tests passed');
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
 Expected: the layout tests still pass, then it throws on `getPostsToHide` not being exported yet.
 
-- [ ] **Step 3: Add the pure function and DOM wiring to js/theme.js**
+- [x] **Step 3: Add the pure function and DOM wiring to js/theme.js**
 
 Insert into `js/theme.js` above Task 3's `initLayout()` definition:
 
@@ -765,21 +770,21 @@ if (typeof module !== 'undefined') {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
 Expected: prints `layout tests passed` then `dedup tests passed`, exit code 0.
 
-- [ ] **Step 5: Verify theme.js still has valid browser syntax**
+- [x] **Step 5: Verify theme.js still has valid browser syntax**
 
 Run: `node --check /Users/kate/projects/simblr/js/theme.js`
 Expected: no output, exit code 0.
 
-- [ ] **Step 6: Manual verification**
+- [x] **Step 6: Manual verification**
 
 On your live Tumblr blog (or the Edit HTML preview), tag an older duplicate post `superseded` and confirm it disappears from the rendered feed while its newer self-reblog (with the download link) stays visible. Confirm a post tagged `superseded` with no actual duplicate on the page is unaffected.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add js/theme.js js/theme.test.js && git commit -m "Add opt-in repost dedup via superseded tag"
@@ -787,7 +792,7 @@ cd /Users/kate/projects/simblr && git add js/theme.js js/theme.test.js && git co
 
 ---
 
-### Task 5: Port ref.html's sidebar, nav, and pagination chrome into css/base.css
+### Task 5: Port ref.html's sidebar, nav, and pagination chrome into css/base.css  ✅ DONE
 
 **Files:**
 - Modify: `css/base.css`
@@ -798,7 +803,7 @@ cd /Users/kate/projects/simblr && git add js/theme.js js/theme.test.js && git co
 
 **Context:** `ref.html`'s inline `<style>` block (lines 43-692) doesn't use CSS custom properties — it uses Tumblr's live customizer field syntax directly (e.g. `{color:background}`). The concrete default values live in `ref.html`'s `<meta name="color:...">` tags (lines 13-20). This task ports those defaults as fixed values into this project's `:root` var system, per the approved design (§4) — colors become static for now, not wired to new Tumblr customizer fields (that would be new scope beyond the spec).
 
-- [ ] **Step 1: Extend the `:root` color and font tokens**
+- [x] **Step 1: Extend the `:root` color and font tokens**
 
 Find:
 ```css
@@ -827,7 +832,7 @@ Note: `--muted-text-color` uses `17, 17, 17` (the RGB of `--primary-text-color`'
 
 Also note: `{color:Link hover}` already exists as a Tumblr customizer field in `theme.html` (default `#f08dbd`) — do not overwrite that default with `ref.html`'s `#eeeeee`; it's this project's own prior choice.
 
-- [ ] **Step 2: Add scrollbar styling**
+- [x] **Step 2: Add scrollbar styling**
 
 Add to `css/base.css` (new section, after the `:root` block):
 ```css
@@ -847,7 +852,7 @@ Add to `css/base.css` (new section, after the `:root` block):
 }
 ```
 
-- [ ] **Step 3: Style the left sidebar (profile/nav)**
+- [x] **Step 3: Style the left sidebar (profile/nav)**
 
 Add:
 ```css
@@ -895,7 +900,7 @@ Add:
 }
 ```
 
-- [ ] **Step 4: Style the nav menu (dotted-underline links)**
+- [x] **Step 4: Style the nav menu (dotted-underline links)**
 
 Add:
 ```css
@@ -931,7 +936,7 @@ Add:
 }
 ```
 
-- [ ] **Step 5: Style the pagination footer**
+- [x] **Step 5: Style the pagination footer**
 
 Add:
 ```css
@@ -954,11 +959,11 @@ Add:
 }
 ```
 
-- [ ] **Step 6: Manual verification**
+- [x] **Step 6: Manual verification**
 
 Open `theme.html` via Tumblr's live preview (or a local static copy with placeholder content, per `work-docs/GETTING_STARTED.md` §5's dev-loop notes). Confirm: left sidebar is fixed-position with uppercase small-caps title and dotted-underline nav links; right sidebar (when an image is set) sits fixed on the opposite edge; Previous/Next links at the bottom are indented past the sidebar width and separated by a border.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add css/base.css && git commit -m "Port ref.html sidebar, nav, and pagination styling into base.css"
@@ -966,7 +971,7 @@ cd /Users/kate/projects/simblr && git add css/base.css && git commit -m "Port re
 
 ---
 
-### Task 6: Port ref.html's post-card typography and reblog-trail styling
+### Task 6: Port ref.html's post-card typography and reblog-trail styling  ✅ DONE
 
 **Files:**
 - Modify: `css/base.css`
@@ -976,7 +981,7 @@ cd /Users/kate/projects/simblr && git add css/base.css && git commit -m "Port re
 
 **Context:** `{PostNotes}` in `theme.html` outputs Tumblr's own generated markup for the reblog trail and notes list — it uses Tumblr's fixed class names (`.comment`, `.user`, `ol.notes li`, etc.), not this project's custom classes, so `ref.html`'s CSS for that content ports over unchanged. Post titles and tag lists, however, use this project's own class names (`.post-title`, `.tagscont`), which differ from `ref.html`'s (`.title`, `.tags`) — those get the same visual treatment applied to the correct selectors.
 
-- [ ] **Step 1: Style post titles**
+- [x] **Step 1: Style post titles**
 
 Add to `css/base.css`:
 ```css
@@ -996,7 +1001,7 @@ Add to `css/base.css`:
 }
 ```
 
-- [ ] **Step 2: Style the tags list**
+- [x] **Step 2: Style the tags list**
 
 Add:
 ```css
@@ -1021,7 +1026,7 @@ Add:
 }
 ```
 
-- [ ] **Step 3: Style the Tumblr-generated reblog trail and notes**
+- [x] **Step 3: Style the Tumblr-generated reblog trail and notes**
 
 Add:
 ```css
@@ -1066,11 +1071,11 @@ article .comment:first-of-type .user {
 }
 ```
 
-- [ ] **Step 4: Manual verification**
+- [x] **Step 4: Manual verification**
 
 In Tumblr's live preview, open a post with a reblog trail and check tags: post titles render uppercase with letter-spacing; tags are comma-separated inline links; the reblog trail shows each commenter's name followed by "commented:" with a dotted divider between entries.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add css/base.css && git commit -m "Port ref.html post title, tags, and reblog-trail styling into base.css"
