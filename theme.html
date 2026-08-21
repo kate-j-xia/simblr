@@ -120,7 +120,8 @@
                     {block:NotReblog}original-post{/block:NotReblog}
                     {block:RebloggedFrom}reblogged-post via-name="{ReblogParentName}" src-name="{ReblogRootName}"{/block:RebloggedFrom}
                     username="{block:NotReblog}{Name}{/block:NotReblog}{block:RebloggedFrom}{ReblogRootName}{/block:RebloggedFrom}"
-                    root-url="{block:NotReblog}{Permalink}{block:NotReblog}{block:RebloggedFrom}{ReblogRootURL}{/block:RebloggedFrom}"
+                    root-url="{block:NotReblog}{Permalink}{/block:NotReblog}{block:RebloggedFrom}{ReblogRootURL}{/block:RebloggedFrom}"
+                    data-tags="{block:HasTags}{block:Tags}{Tag}|{/block:Tags}{/block:HasTags}"
                     {block:HasTags}has-tags{/block:HasTags}
                 >
                     <div class="post-outer">
