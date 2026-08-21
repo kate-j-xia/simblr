@@ -39,21 +39,28 @@ theme vs. this project's split `css/`/`js`/`theme.html`).
 
 ## 2. Duplicate-repost handling
 
-**Root cause**: reblogging your own earlier post to attach a download link once a file is ready
-creates two separate feed entries (original photo post + self-reblog) containing the same image.
+**Root cause**: reblogging your own earlier post (e.g. to attach a download link once a file is
+ready) creates two separate feed entries (original + self-reblog) containing the same image.
+However, not every repost is a true duplicate — some reposts of the same original carry genuinely
+different content (different caption, different addition) that should stay visible. A blanket
+"same root post = hide the older one" rule would silently swallow those too, which is worse than
+the original visual annoyance.
 
-**Approach**: each post in `theme.html` already computes a `root-url` attribute intended to trace
-back to the original post (`{ReblogRootURL}` on reblogs, `{Permalink}` otherwise) — this currently
-has a template bug (mismatched `{block:NotReblog}` open tags, never closed) that must be fixed as
-part of this work regardless of the dedup feature.
+**Approach — opt-in via tag**: no automatic content comparison. Instead, when a repost is truly
+superseding an earlier one (nothing new to see in the older post), tag the *older* post with a
+fixed marker tag (e.g. `superseded`). A small JS pass after page load (on any page showing
+multiple posts — home and tag pages both) hides any post tagged `superseded` **only if** another
+visible post shares its `root-url` (so a stray `superseded` tag on a post with no matching repost
+on the same page doesn't vanish it). This keeps control per-post and in your hands — reposts with
+new content simply never get tagged, so they're untouched.
 
-Once fixed, a small JS pass after page load (on any page showing multiple posts — home and tag
-pages both) groups visible posts by `root-url`. Tumblr lists posts newest-first, so a self-reblog
-(with the download link) always appears *before* the original post it reblogged. The script keeps
-the first occurrence of each `root-url` and hides the rest.
+This still depends on the `root-url` attribute in `theme.html`, which currently has a template bug
+(mismatched `{block:NotReblog}` open tags, never closed) that needs fixing for the matching to work
+at all.
 
-**Trade-off** (acknowledged, acceptable at this scale): this is a client-side hide — the duplicate
-post still loads before being hidden. No server-side filtering; fine for a personal theme.
+**Trade-off** (acknowledged, acceptable at this scale): requires you to remember to tag superseded
+posts; nothing happens automatically if you forget. That's intentional — it trades a little manual
+upkeep for zero risk of hiding content you wanted visible.
 
 ## 3. Custom pages
 
