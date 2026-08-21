@@ -6,12 +6,21 @@
 }
 
 /* -- typography ------------------------------------------------------------ */
+
+
 body {
     margin:0;
     font-size:{select:font size};
-    font-family:JetBrains Mono, serif;
-    text-align:left;
-    word-wrap:break-word;
+
+    font:var(--Body-Font-Weight,normal) var(--Body-Font-Size,0.9rem)/var(--Body-Line-Height,1.5) var(--Body-Font-Family), sans-serif;
+    letter-spacing:var(--Body-Letter-Spacing);
+    word-spacing:var(--Body-Word-Spacing);
+    word-break:break-word;
+    -moz-osx-font-smoothing:grayscale;
+    -webkit-font-smoothing:antialiased;
+    font-smoothing:antialiased;
     color:var(--primary-text-color);
     background:var(--primary-bg-color);
 }
+
+/* -- grid ------------------------------------------------------------ */

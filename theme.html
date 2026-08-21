@@ -47,13 +47,13 @@
 
         <!------ SCRIPTS & SHEETS ------->
 
-        <link href="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/css/base.css" rel="stylesheet">
-        <link href="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/css/dark.css" rel="stylesheet">
+        <link href="https://kate-j-xia.github.io/simblr/css/base.css" rel="stylesheet">
+        <link href="https://kate-j-xia.github.io/simblr/css/dark.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-        <script defer src="/path/to/infinite-scroll.pkgd.min.js"></script>
-        <script defer src="/path/to/masonry.pkgd.min.js"></script>
-        <script defer src="https://github.com/kate-j-xia/simblr/blob/1f4433b567012e1f33eea6b0fab3f1275ba94f4c/js/theme.js"></script>
+        <script defer src="https://kate-j-xia.github.io/simblr/js/vendor/masonry.pkgd.min.js"></script>
+        <script defer src="https://kate-j-xia.github.io/simblr/js/vendor/infinite-scroll.pkgd.min.js"></script>
+        <script defer src="https://kate-j-xia.github.io/simblr/js/theme.js"></script>
 
 
     </head>
@@ -109,10 +109,13 @@
 
             <!----- POSTS ------>
 
-            <section class="posts">
+            <section class="posts grid">
+                <div class="grid__col-sizer"></div>
+                <div class="grid__gutter-sizer"></div>
 
+                {block:Posts}
                 <article
-                    class="posts"
+                    class="posts grid__item"
                     id="post-{PostID}"
                     post-type="{PostType}"
                     {block:NotReblog}original-post{/block:NotReblog}
@@ -439,10 +442,12 @@
 
             {block:PreviousPage}<a href="{PreviousPage}">{lang:Previous page} </a>{/block:PreviousPage}
 
-            {block:NextPage}<a href="{NextPage}">  {lang:Next page}</a>{/block:NextPage}
+            {block:NextPage}<a class="pagination__next" href="{NextPage}">  {lang:Next page}</a>{/block:NextPage}
 
             {block:IndexPage}{block:ifInfiniteScroll}
-            
+            <div class="page-load-status">
+                <div class="infinite-scroll-request-error">{lang:Error loading more posts}</div>
+            </div>
             {/block:ifInfiniteScroll}{/block:IndexPage}
                 
         </main>
