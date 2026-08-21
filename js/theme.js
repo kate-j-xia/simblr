@@ -47,6 +47,42 @@ function writeStoredLayout(bucket, layout) {
     }
 }
 
+// Opt-in dedup: a post is only hidden if it's tagged `superseded` AND another
+// post on the page shares its root URL without that tag, so at least one copy
+// always survives.
+function getPostsToHide(posts) {
+    const groups = new Map();
+    posts.forEach((post, i) => {
+        if (!groups.has(post.rootUrl)) {
+            groups.set(post.rootUrl, []);
+        }
+        groups.get(post.rootUrl).push(i);
+    });
+
+    const hide = new Set();
+    groups.forEach((indices) => {
+        if (indices.length < 2) return;
+        const hasVisibleSurvivor = indices.some((i) => !posts[i].superseded);
+        if (!hasVisibleSurvivor) return;
+        indices.forEach((i) => {
+            if (posts[i].superseded) hide.add(i);
+        });
+    });
+    return hide;
+}
+
+function removeSupersededReposts() {
+    const articles = Array.from(document.querySelectorAll('article.posts'));
+    const posts = articles.map((article) => ({
+        rootUrl: article.getAttribute('root-url') || '',
+        superseded: (article.dataset.tags || '')
+            .split('|')
+            .includes('superseded'),
+    }));
+
+    getPostsToHide(posts).forEach((i) => articles[i].remove());
+}
+
 function initLayout() {
     const section = document.querySelector('section.posts');
     if (!section) return;
@@ -107,6 +143,9 @@ function initLayout() {
 }
 
 if (typeof document !== 'undefined') {
+    // Dedup first: initLayout() snapshots the article list, so anything removed
+    // afterwards would leave a stale reference and a hole in the grid.
+    removeSupersededReposts();
     initLayout();
 }
 
@@ -114,6 +153,7 @@ if (typeof module !== 'undefined') {
     module.exports = {
         getLayoutBucket,
         resolveLayout,
+        getPostsToHide,
         LAYOUT_STORAGE_KEY,
     };
 }
