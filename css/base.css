@@ -24,3 +24,99 @@ body {
 }
 
 /* -- grid ------------------------------------------------------------ */
+
+/* NOTE: theme.html puts class="posts" on both the <section> and each <article>,
+   so these rules are element-qualified to avoid hitting individual posts. */
+section.posts {
+    margin: 0 0 0 375px;
+    max-width: 900px;
+}
+
+/* Sizers are measurement-only: invisible, and ignored in list layout. */
+.grid__col-sizer,
+.grid__gutter-sizer {
+    height: 0;
+}
+
+.grid__col-sizer {
+    width: 50%;
+}
+
+.grid__gutter-sizer {
+    width: 40px;
+}
+
+.grid .grid__item {
+    width: calc(50% - 20px);
+    margin-bottom: 40px;
+}
+
+.grid .grid__item img {
+    width: 100%;
+    display: block;
+}
+
+/* Avoid the load-then-jump flicker: hide until Masonry has measured.
+   The animation is a failsafe — if theme.js fails to load, the feed still
+   reveals itself after 3s rather than leaving a permanently blank page. */
+section.posts:not(.is-loaded) {
+    opacity: 0;
+    animation: reveal-failsafe 0s 3s forwards;
+}
+
+@keyframes reveal-failsafe {
+    to { opacity: 1; }
+}
+
+section.posts.is-loaded {
+    opacity: 1;
+    transition: opacity .3s ease;
+}
+
+/* -- layout toggle ------------------------------------------------------- */
+
+.layout-toggle {
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    background: var(--primary-bg-color);
+    font-size: .8em;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-family: "Lato", sans-serif;
+    color: var(--muted-text-color);
+    cursor: pointer;
+}
+
+/* -- responsive ------------------------------------------------------------ */
+
+@media (max-width: 700px) {
+    #sidebar-left,
+    #sidebar-right {
+        position: static;
+        width: auto;
+        max-height: none;
+        padding: 50px 25px 25px 25px;
+    }
+
+    section.posts {
+        margin: 0 25px;
+    }
+
+    .grid__col-sizer {
+        width: 100%;
+    }
+
+    .grid__gutter-sizer {
+        width: 0;
+    }
+
+    .grid .grid__item {
+        width: 100%;
+    }
+
+    .pagination {
+        margin: 50px 25px;
+        padding: 25px 0 0 0;
+    }
+}

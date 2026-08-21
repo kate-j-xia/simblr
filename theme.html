@@ -90,6 +90,7 @@
                     {block:ifLink4}<li><a href="{text:link 4 url}">{text:link 4}</a></li>{/block:ifLink4}
                     {block:ifLink5}<li><a href="{text:link 5 url}">{text:link 5}</a></li>{/block:ifLink5}
                     {block:ifLink6}<li><a href="{text:link 6 url}">{text:link 6}</a></li>{/block:ifLink6}
+                    {block:IndexPage}<li><button type="button" class="layout-toggle" hidden>grid view</button></li>{/block:IndexPage}
                 </nav>
             </section>
         </aside>
@@ -108,13 +109,17 @@
 
             <!----- POSTS ------>
 
-            <section class="posts grid">
+            <section
+                class="posts"
+                data-page-kind="{block:TagPage}tag{/block:TagPage}{block:PermalinkPage}permalink{/block:PermalinkPage}"
+                data-tag="{block:TagPage}{Tag}{/block:TagPage}"
+            >
                 <div class="grid__col-sizer"></div>
                 <div class="grid__gutter-sizer"></div>
 
                 {block:Posts}
                 <article
-                    class="posts grid__item"
+                    class="posts"
                     id="post-{PostID}"
                     post-type="{PostType}"
                     {block:NotReblog}original-post{/block:NotReblog}
