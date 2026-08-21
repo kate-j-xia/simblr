@@ -81,6 +81,58 @@
     cursor: pointer;
 }
 
+/* -- posts container ------------------------------------------------------ */
+
+section.posts {
+    margin: 0 0 0 var(--feed-offset);
+    padding-top: 150px;
+    min-height: calc(100vh - 150px);
+    position: relative;
+}
+
+/* The rail is a one-column device. In grid mode it would sit far left of the
+   right-hand column and read as an accident, so it is list-mode only —
+   js/theme.js adds .grid to this element when grid layout is active. */
+section.posts:not(.grid) {
+    width: var(--post-width);
+    padding-left: var(--rail-inset);
+    border-left: 1px solid var(--border-color);
+}
+
+section.posts.grid {
+    max-width: 900px;
+}
+
+section.posts:not(.grid) article.posts {
+    padding-bottom: 150px;
+}
+
+/* -- pagination ------------------------------------------------------------ */
+
+.pagination {
+    position: relative;
+    display: block;
+    margin: 0 0 150px var(--feed-offset);
+    padding: 50px 0 0 0;
+    color: var(--muted-text-color);
+    border-top: 1px solid var(--border-color);
+}
+
+/* In list mode the feed is inset past its rail, so pagination must match or
+   Previous/Next hang 100px to the left of the post text above them. */
+section.posts:not(.grid) ~ .pagination {
+    padding-left: var(--rail-inset);
+    width: var(--post-width);
+    /* Continues the feed's rail, forming an L with the border-top above. */
+    border-left: 1px solid var(--border-color);
+}
+
+.pagination a {
+    display: inline-block;
+    margin: 0 10px 0 0;
+    color: var(--muted-text-color);
+}
+
 /* -- grid ------------------------------------------------------------ */
 
 /* Sizers are measurement-only: invisible, and ignored in list layout. */
@@ -148,5 +200,27 @@ section.posts.is-loaded {
 
     .grid .grid__item {
         width: 100%;
+    }
+
+    /* The rail and the 375px offset both assume a fixed sidebar, which this
+       breakpoint unpins — so both are removed here. */
+    section.posts,
+    section.posts:not(.grid) {
+        margin: 0 25px;
+        width: auto;
+        padding-left: 0;
+        padding-top: 25px;
+        border-left: 0;
+    }
+
+    section.posts:not(.grid) article.posts {
+        padding-bottom: 75px;
+    }
+
+    .pagination,
+    section.posts:not(.grid) ~ .pagination {
+        margin: 0 25px 50px 25px;
+        padding: 25px 0 0 0;
+        width: auto;
     }
 }
