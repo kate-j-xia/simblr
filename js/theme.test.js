@@ -3,6 +3,7 @@ const {
     getLayoutBucket,
     resolveLayout,
     getPostsToHide,
+    getPhotosetRows,
 } = require('./theme.js');
 
 const NARRATIVE = ['ts2-legacies', 'ts3-legacies'];
@@ -74,3 +75,21 @@ assert.deepStrictEqual(
 );
 
 console.log('dedup tests passed');
+
+// Photoset layout strings are digit-per-row, e.g. "221" = 2, then 2, then 1.
+assert.deepStrictEqual(getPhotosetRows('221'), [2, 2, 1]);
+assert.deepStrictEqual(getPhotosetRows('3'), [3]);
+assert.deepStrictEqual(getPhotosetRows('111'), [1, 1, 1]);
+
+// Degenerate input must not throw — a malformed layout should fall back to
+// "no rows", which leaves the images stacked rather than breaking the page.
+assert.deepStrictEqual(getPhotosetRows(''), []);
+assert.deepStrictEqual(getPhotosetRows(null), []);
+assert.deepStrictEqual(getPhotosetRows(undefined), []);
+assert.deepStrictEqual(getPhotosetRows('abc'), []);
+assert.deepStrictEqual(getPhotosetRows('2x1'), []);
+
+// A literal zero would create an empty row; treat the whole string as invalid.
+assert.deepStrictEqual(getPhotosetRows('201'), []);
+
+console.log('photoset tests passed');

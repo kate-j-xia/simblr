@@ -360,3 +360,26 @@ section.posts.grid .q:after {
     border-radius: 100%;
     vertical-align: middle;
 }
+
+/* -- photosets ------------------------------------------------------------ */
+
+/* Rows are built by layoutPhotosets() in js/theme.js from {PhotosetLayout}.
+   Until that runs, images stay stacked — which is a fine fallback. */
+.photo-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.photo-row:last-child {
+    margin-bottom: 0;
+}
+
+/* Equal-width columns regardless of intrinsic image size; min-width:0 stops
+   flex items from refusing to shrink below their content width. */
+.photo-row img {
+    flex: 1 1 0;
+    min-width: 0;
+    object-fit: cover;
+    display: block;
+}

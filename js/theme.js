@@ -71,6 +71,44 @@ function getPostsToHide(posts) {
     return hide;
 }
 
+// {PhotosetLayout} is a digit-per-row string: "221" means a row of two, a row
+// of two, then a row of one. Returns [] for anything malformed, which leaves
+// the photoset stacked rather than throwing.
+function getPhotosetRows(layout) {
+    if (typeof layout !== 'string' || layout === '') return [];
+    if (!/^[1-9]+$/.test(layout)) return [];
+    return layout.split('').map(Number);
+}
+
+function layoutPhotosets() {
+    const sets = document.querySelectorAll('.photo-slideshow[data-layout]');
+
+    sets.forEach((set) => {
+        const rows = getPhotosetRows(set.dataset.layout);
+        if (rows.length === 0) return;
+
+        const images = Array.from(set.children);
+        let i = 0;
+
+        rows.forEach((count) => {
+            const row = document.createElement('div');
+            row.className = 'photo-row';
+            images.slice(i, i + count).forEach((img) => row.appendChild(img));
+            i += count;
+            if (row.children.length > 0) set.appendChild(row);
+        });
+
+        // Any images the layout string didn't account for go in a final row,
+        // so a mismatch between layout and photo count never drops a photo.
+        if (i < images.length) {
+            const row = document.createElement('div');
+            row.className = 'photo-row';
+            images.slice(i).forEach((img) => row.appendChild(img));
+            set.appendChild(row);
+        }
+    });
+}
+
 function removeSupersededReposts() {
     const articles = Array.from(document.querySelectorAll('article.posts'));
     const posts = articles.map((article) => ({
@@ -143,9 +181,12 @@ function initLayout() {
 }
 
 if (typeof document !== 'undefined') {
-    // Dedup first: initLayout() snapshots the article list, so anything removed
-    // afterwards would leave a stale reference and a hole in the grid.
+    // Order matters. Dedup first: initLayout() snapshots the article list, so
+    // anything removed afterwards leaves a stale reference and a hole in the
+    // grid. Photosets next, because they change post height and Masonry must
+    // measure the final layout.
     removeSupersededReposts();
+    layoutPhotosets();
     initLayout();
 }
 
@@ -154,6 +195,7 @@ if (typeof module !== 'undefined') {
         getLayoutBucket,
         resolveLayout,
         getPostsToHide,
+        getPhotosetRows,
         LAYOUT_STORAGE_KEY,
     };
 }
