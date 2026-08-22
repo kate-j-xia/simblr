@@ -15,6 +15,16 @@
 
 #sidebar-left {
     left: 0;
+    /* Full height + column flex so .prefs can be pushed to the bottom with
+       margin-top:auto. box-sizing keeps the 150px/50px padding inside 100vh. */
+    height: 100vh;
+    /* Overrides the shared max-height above, which would otherwise clamp this
+       to 100vh - 200px and leave .prefs floating short of the bottom. */
+    max-height: none;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 #sidebar-right {
@@ -88,7 +98,11 @@
    destination. The label is constant and the icon's FILL axis carries the
    state, so a new setting is one more .pref-toggle with the same shape. */
 .prefs {
-    margin-top: 35px;
+    /* Pushed to the bottom of the sidebar. The 35px is the floor for when the
+       nav is long enough to meet it. */
+    margin-top: auto;
+    padding-top: 35px;
+    width: 100%;
 }
 
 .pref-toggle {
@@ -102,6 +116,25 @@
     border: 0;
     background: none;
     cursor: pointer;
+    /* A <button> does not inherit type by default — without these it renders in
+       the UA's 13.3px Arial, and .pref-label's .8em then resolves against that
+       instead of the body, making the row bigger than the nav links above it. */
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Keyboard focus needs to stay visible, but the UA ring sits awkwardly on a
+   full-width row, so mark the label rather than the whole button. */
+.pref-toggle:focus {
+    outline: none;
+}
+
+.pref-toggle:focus-visible .pref-label {
+    outline: 1px dotted var(--muted-text-color);
+    outline-offset: 3px;
 }
 
 /* Same dotted leader as .menu li, drawn behind the row; the label and icon
@@ -263,6 +296,18 @@ section.posts.is-loaded {
         width: auto;
         max-height: none;
         padding: 50px 25px 25px 25px;
+    }
+
+    /* The sidebar unpins here and stacks above the feed, so a 100vh column
+       would leave a screen of blank space before the first post, and pinning
+       .prefs to its bottom would push the settings off the first screen. */
+    #sidebar-left {
+        height: auto;
+        display: block;
+    }
+
+    .prefs {
+        margin-top: 35px;
     }
 
     .grid__col-sizer {
