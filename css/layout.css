@@ -21,6 +21,13 @@
     right: 0;
 }
 
+/* The optional right-sidebar image; constrain it to the sidebar's width so a
+   large upload cannot overflow the fixed column. */
+#sidebar-right .side {
+    display: block;
+    width: 100%;
+}
+
 #sidebar-left .title {
     display: block;
     margin-bottom: 15px;

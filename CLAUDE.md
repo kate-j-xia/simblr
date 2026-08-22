@@ -11,7 +11,8 @@ step, no package manager, no framework. The only test runner is `node js/theme.t
 
 1. `docs/superpowers/plans/2026-08-21-ref-html-replica.md` — **the active plan.** Its **Progress**
    section lists what's done, deviations, known issues, and a "How to resume" block.
-   **Read it before touching anything.** Tasks 1–7 done; resume at Task 8.
+   **Read it before touching anything.** Tasks 1–9 done except Step 10 of Task 9, which is the
+   publish step (merge to `main`, push, paste `theme.html` into Tumblr) — the user's call.
 2. `docs/superpowers/specs/2026-08-21-ref-html-replica-design.md` — the approved design behind it.
 3. `docs/superpowers/plans/2026-08-21-theme-layout-and-pages.md` — the *earlier* plan. Tasks 1–6
    done; Tasks 7–9 (custom pages, doc refresh) are still open and unaffected by the newer plan.
@@ -65,15 +66,17 @@ won't show up in Tumblr.
   `{block:TagPage}` and `{block:PermalinkPage}` are used to emit page kind. The post loop follows
   `ref.html`'s structure: content, then a `.when` footer carrying date, attribution, and tags.
   There is **no post header** — no avatar or username above the post, by design.
-- **`js/theme.js`** — pure, tested functions (`getLayoutBucket`, `resolveLayout`, `getPostsToHide`)
-  plus DOM wiring. On load it runs dedup → layout, in that order; each step changes post height and
-  Masonry must measure last. A sidebar toggle writes a grid/list override per bucket under
+- **`js/theme.js`** — pure, tested functions (`getLayoutBucket`, `resolveLayout`, `getPostsToHide`,
+  `getPhotosetRows`) plus DOM wiring. On load it runs dedup → photoset rows → layout, in that
+  order; each step changes post height and Masonry must measure last. A sidebar toggle writes a
+  grid/list override per bucket under
   `simblr-layout`. Masonry is initialized/destroyed as layout changes.
 - **CSS is split by concern**, linked from `theme.html` in this order (tokens must be first):
   - `css/tokens.css` — `:root` custom properties. The only place to change palette or typeface.
   - `css/base.css` — reset, body typography, links, scrollbar. No layout, no components.
   - `css/layout.css` — sidebars, posts container and rail, Masonry grid, pagination, responsive.
-  - `css/posts.css` — post-card internals (titles, media, trail, tags, `.when`, asks, chat, notes).
+  - `css/posts.css` — post-card internals (titles, media, photoset rows, trail, tags, `.when`,
+    asks, chat, notes).
   - `css/dark.css` — empty. Dark mode not started; it should only need to override tokens.
 - **`dev/preview.html`** — local harness. Never linked from `theme.html`.
 
@@ -102,6 +105,11 @@ column. Narrative tags are listed in `NARRATIVE_TAGS` in `js/theme.js`; that lis
 - **The rail is list-mode only.** `section.posts:not(.grid)` owns the `border-left` and
   `padding-left`; `section.posts:not(.grid) ~ .pagination` mirrors them so Previous/Next line up
   with the post text. That sibling selector depends on `.pagination` following `section.posts`.
+- **Photoset rows depend on `data-layout`, not `layout`.** The ref3 markup used a bare `layout`
+  attribute; `getPhotosetRows` reads `dataset.layout`. A malformed layout string returns `[]` and
+  leaves the images stacked rather than throwing.
+- **Every code path out of `initLayout()` must add `.is-loaded`.** The permalink early-return once
+  skipped it, so permalink pages stayed blank until the 3s failsafe fired.
 - **Icons are Material Icons**, linked in `<head>`. The post markup originally used `mageicons`
   (from `ref3.html`) whose stylesheet was never loaded, so all six icons rendered as nothing.
 - **`{LikeButton}` and `Tumblr.Lightbox.init(...)` can only be tested inside Tumblr.**

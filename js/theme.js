@@ -130,7 +130,13 @@ function initLayout() {
         section.dataset.tag,
         NARRATIVE_TAGS
     );
-    if (bucket === 'permalink') return;
+    // Permalinks are always one column, so there is nothing to lay out or
+    // toggle — but the feed still has to be revealed, or it stays invisible
+    // until the 3s reveal-failsafe animation fires.
+    if (bucket === 'permalink') {
+        section.classList.add('is-loaded');
+        return;
+    }
 
     const articles = Array.from(section.querySelectorAll('article.posts'));
     const toggle = document.querySelector('.layout-toggle');

@@ -12,8 +12,8 @@
 
 ## Progress — read this first
 
-**Tasks 1–7 are done and committed** on branch `base-grid`, through commit `764b339`.
-**Resume at Task 8** (vanilla photoset row layout), then Task 9.
+**All tasks are done and committed** on branch `base-grid`, except **Task 9 Step 10** — the
+publish step (merge to `main`, push, paste `theme.html` into Tumblr), which is the user's call.
 
 Nothing has been pushed. `main` is 18 commits ahead of `origin/main` and `base-grid` is ahead of
 `main` — see "How to resume" below for the exact sequence.
@@ -23,6 +23,10 @@ Nothing has been pushed. `main` is 18 commits ahead of `origin/main` and `base-g
 - Grid mode: two columns at x=375 and x=842, 427px each. Masonry positions via percentage `left`,
   not `transform` — measure with `getBoundingClientRect()` *after* layout settles, or you will
   misread a race as a broken grid.
+- Photosets: `data-layout="21"` with three images renders a row of two (211px each in grid,
+  248px in list) then one full-width image, in both grid and list mode.
+- Permalink, narrative tag, catalog tag, home, and the sub-700px breakpoint all resolve to the
+  documented layout, and the toggle choice survives a reload.
 - List mode: rail at 100px inset, feed width 500px, pagination text aligned to the post text at
   476px (both clear the 1px rail border).
 - Post cards match `ref.html`: uppercase letter-spaced title with a full-measure underline, Lora
@@ -48,22 +52,29 @@ Nothing has been pushed. `main` is 18 commits ahead of `origin/main` and `base-g
    this plan.
 5. **`.claude/launch.json` was added** so the preview harness can be served over HTTP
    (`python3 -m http.server 8765`) rather than `file://`, which is what the preview tooling needs.
+   A second `preview-alt` config on port 8766 was added later, for when 8765 is already taken.
+6. **Task 9's CSS audit found two gaps rather than dead ref3 rules.** The three "styled but never
+   emitted" selectors (`grid`, `photo-row`, `tmblr-full`) are all added at runtime, so nothing was
+   deleted. Instead: `initLayout()`'s permalink early-return never added `.is-loaded`, leaving
+   permalink pages blank until the 3s failsafe fired; and `.side` (the optional right-sidebar
+   image) had no width constraint. Both fixed.
+7. **`CLAUDE.md` and `GETTING_STARTED.md` were updated surgically, not wholesale.** The versions
+   in the repo had already outgrown the replacement text this plan specified in Task 9 Steps 4–6.
 
 ### How to resume
 
 ```bash
 cd /Users/kate/projects/simblr
-git checkout base-grid          # already there; 764b339 is the tip
-node js/theme.test.js           # layout + dedup tests should pass
+git checkout base-grid          # already there
+node js/theme.test.js           # layout + dedup + photoset tests should pass
 python3 -m http.server 8765     # then open http://localhost:8765/dev/preview.html
 ```
 
-Then work Task 8, then Task 9. Task 9 Step 10 is the publish step — **that is the only step that
-touches the live blog**, and pushing is the user's call, not the agent's.
+Only Task 9 Step 10 remains. **That is the only step that touches the live blog**, and pushing is
+the user's call, not the agent's.
 
 ### Known issues / not yet verified
 
-- **Photosets are still stacked, not in rows.** That is Task 8, the next task.
 - **Nothing has been seen inside Tumblr yet.** `{LikeButton}`, `{PostNotes}`, `Tumblr.Lightbox`,
   and real photoset markup cannot be exercised by the harness.
 - **`{block:Answer}` uses `{Replies}`**, carried over from `ref.html`. Unverified against current
@@ -1434,7 +1445,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 ---
 
-### Task 8: Vanilla photoset row layout
+### Task 8: Vanilla photoset row layout  ✅ DONE
 
 **Files:**
 - Modify: `js/theme.js`
@@ -1451,7 +1462,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 Ordering matters: this must run before Masonry measures, so it goes with `removeSupersededReposts()` in the entry point — dedup → photosets → layout.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `js/theme.test.js`, and add `getPhotosetRows` to the existing destructured `require` at the top of the file:
 ```javascript
@@ -1474,12 +1485,12 @@ assert.deepStrictEqual(getPhotosetRows('201'), []);
 console.log('photoset tests passed');
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
 Expected: the layout and dedup tests pass, then it throws on `getPhotosetRows` not being a function.
 
-- [ ] **Step 3: Implement the pure function and DOM wiring**
+- [x] **Step 3: Implement the pure function and DOM wiring**
 
 In `js/theme.js`, insert above `removeSupersededReposts()`:
 ```javascript
@@ -1522,7 +1533,7 @@ function layoutPhotosets() {
 }
 ```
 
-- [ ] **Step 4: Wire it into the entry point and exports**
+- [x] **Step 4: Wire it into the entry point and exports**
 
 Find:
 ```javascript
@@ -1566,17 +1577,17 @@ if (typeof module !== 'undefined') {
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `node /Users/kate/projects/simblr/js/theme.test.js`
 Expected: prints `layout tests passed`, `dedup tests passed`, `photoset tests passed`, exit code 0.
 
-- [ ] **Step 6: Verify syntax**
+- [x] **Step 6: Verify syntax**
 
 Run: `node --check /Users/kate/projects/simblr/js/theme.js`
 Expected: no output, exit code 0.
 
-- [ ] **Step 7: Add the photoset row CSS**
+- [x] **Step 7: Add the photoset row CSS**
 
 Append to `css/posts.css`:
 ```css
@@ -1604,11 +1615,11 @@ Append to `css/posts.css`:
 }
 ```
 
-- [ ] **Step 8: Manual verification**
+- [x] **Step 8: Manual verification**
 
 Open `dev/preview.html`. The photoset fixture uses `data-layout="21"` with three images, so it must render as a row of two side by side, then a single full-width image beneath. Resize the window — rows stay proportional. Toggle to list mode and confirm the rows still hold.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add js/theme.js js/theme.test.js css/posts.css && git commit -m "Add vanilla photoset row layout, replacing pxuphotoset dependency"
@@ -1616,7 +1627,7 @@ cd /Users/kate/projects/simblr && git add js/theme.js js/theme.test.js css/posts
 
 ---
 
-### Task 9: Remove dead CSS, verify end to end, and update the docs
+### Task 9: Remove dead CSS, verify end to end, and update the docs  ✅ DONE (except Step 10, publish)
 
 **Files:**
 - Modify: `CLAUDE.md`
@@ -1628,7 +1639,7 @@ cd /Users/kate/projects/simblr && git add js/theme.js js/theme.test.js css/posts
 
 **Context:** Tasks 4–7 replaced the markup wholesale. Any CSS still targeting ref3 class names is now dead, and `CLAUDE.md` describes an architecture that no longer exists (it names `css/base.css` as owning everything and cites `css/base.css:13`, a line removed in Task 2).
 
-- [ ] **Step 1: Audit for CSS rules with no matching markup**
+- [x] **Step 1: Audit for CSS rules with no matching markup**
 
 Run:
 ```bash
@@ -1640,7 +1651,7 @@ comm -23 /tmp/css_sel.txt /tmp/html_sel.txt
 ```
 Expected: the only survivors should be classes Tumblr generates rather than `theme.html` (`notes`, `note`, `avatar`, `tmblr-full`, `photo-row`, `grid`, `grid__item`, `is-loaded`, `liked`, `ted`, `alt`). Delete anything else — those are ref3 orphans.
 
-- [ ] **Step 2: Audit for markup with no CSS**
+- [x] **Step 2: Audit for markup with no CSS**
 
 Run:
 ```bash
@@ -1648,7 +1659,7 @@ cd /Users/kate/projects/simblr && echo "=== emitted but never styled ===" && com
 ```
 Expected: a short list only. Anything structural (a wrapper that needs layout) must be styled or removed from the markup.
 
-- [ ] **Step 3: Run the full verification suite**
+- [x] **Step 3: Run the full verification suite**
 
 Run:
 ```bash
@@ -1656,7 +1667,7 @@ cd /Users/kate/projects/simblr && node --check js/theme.js && node js/theme.test
 ```
 Expected: three test lines print, then `no template syntax in css`.
 
-- [ ] **Step 4: Update CLAUDE.md's architecture section**
+- [x] **Step 4: Update CLAUDE.md's architecture section**
 
 In `CLAUDE.md`, find the `## Architecture` section and replace its bullet list with:
 ```markdown
@@ -1678,7 +1689,7 @@ In `CLAUDE.md`, find the `## Architecture` section and replace its bullet list w
   changes can be checked without merging to `main`. Never linked from `theme.html`.
 ```
 
-- [ ] **Step 5: Update CLAUDE.md's gotchas section**
+- [x] **Step 5: Update CLAUDE.md's gotchas section**
 
 In `CLAUDE.md`, find the `## Gotchas that have already caused bugs` section and add these two bullets to the existing list:
 ```markdown
@@ -1690,7 +1701,7 @@ In `CLAUDE.md`, find the `## Gotchas that have already caused bugs` section and 
   leaves images stacked rather than throwing.
 ```
 
-- [ ] **Step 6: Update the reference-themes section of CLAUDE.md**
+- [x] **Step 6: Update the reference-themes section of CLAUDE.md**
 
 Find the `## Reference themes` section and replace its first paragraph with:
 ```markdown
@@ -1700,7 +1711,7 @@ inline CSS has been ported into `css/tokens.css`, `css/base.css`, `css/layout.cs
 markup that was replaced, so treat any resemblance to it as vestigial.
 ```
 
-- [ ] **Step 7: Update GETTING_STARTED.md's next steps**
+- [x] **Step 7: Update GETTING_STARTED.md's next steps**
 
 In `work-docs/GETTING_STARTED.md`, find the `## 6. Next steps` section and replace its numbered list with:
 ```markdown
@@ -1719,7 +1730,7 @@ In `work-docs/GETTING_STARTED.md`, find the `## 6. Next steps` section and repla
    ported from `ref.html`).
 ```
 
-- [ ] **Step 8: Full manual verification**
+- [x] **Step 8: Full manual verification**
 
 Open each in a browser and confirm:
 - `dev/preview.html` — grid, two columns, no rail, footer on every post
@@ -1729,7 +1740,7 @@ Open each in a browser and confirm:
 - Toggle switches layout and persists across reload
 - Below 700px, one column, no rail, sidebar stacked above the feed
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add CLAUDE.md work-docs/GETTING_STARTED.md css/ && git commit -m "Remove dead ref3 CSS and update docs for the split-CSS architecture"
