@@ -63,7 +63,7 @@ const FOOTER = `
     <div class="post-btns">
         <a href="#" title="permalink"><span class="material-symbols-outlined post-icon icon-permalink">left_click</span></a>
         <a href="#" title="reblog"><span class="material-symbols-outlined post-icon icon-reblog">cheer</span></a>
-        <span class="like-btn" title="like"><span class="material-symbols-outlined post-icon icon-like">cloud</span></span>
+        <span class="like-btn" title="like"><span class="material-symbols-outlined post-icon icon-like">kid_star</span></span>
     </div>`;
 
 POSTS.forEach((body, i) => {
