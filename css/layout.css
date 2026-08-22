@@ -157,10 +157,10 @@ section.posts:not(.grid) ~ .pagination {
     margin-bottom: 40px;
 }
 
-.grid .grid__item img {
-    width: 100%;
-    display: block;
-}
+/* Deliberately NOT setting `.grid .grid__item img { width: 100% }` here: it
+   would outrank posts.css's `.when img` and `.photo-row img` on specificity
+   and blow the inline avatars up to full card width. Post image sizing is
+   posts.css's job. */
 
 /* Avoid the load-then-jump flicker: hide until Masonry has measured.
    The animation is a failsafe — if theme.js fails to load, the feed still
