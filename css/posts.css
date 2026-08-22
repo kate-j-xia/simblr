@@ -341,7 +341,7 @@ section.posts.grid .q:after {
     /* GRAD -25 lightens the stroke against white. The font request in
        theme.html's <head> serves wght 200..300 — a value outside that range is
        silently clamped, so widen the URL before nudging this past 300. */
-    font-variation-settings: 'FILL' 0, 'wght' 320, 'GRAD' -25, 'opsz' 24;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' -25, 'opsz' 24;
     transition: font-variation-settings .2s ease, color .3s linear;
 }
 
@@ -353,7 +353,7 @@ section.posts.grid .q:after {
 
 /* The star's long unbroken strokes also read thin; weight only, size is fine. */
 .post-btns .icon-like {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' -25, 'opsz' 24;
+    font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' -25, 'opsz' 24;
 }
 
 /* -- like button ----------------------------------------------------------- */
