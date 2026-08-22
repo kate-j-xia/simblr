@@ -130,9 +130,13 @@ article.posts .comment:first-of-type .user {
 .chat a {
     color: var(--post-link-color);
     text-decoration: underline;
-    /* 1px reads as a hairline against 12px Lora; the offset keeps it clear of
-       descenders instead of striking through them. */
-    text-decoration-thickness: 0.5px;
+    /* A hairline dropped well clear of the descenders, so it marks the word
+       without striking through it.
+       1px is the floor: sub-pixel thicknesses round to zero and the underline
+       disappears entirely, even on a 2x display. To make the rule lighter,
+       lighten --post-link-underline-color instead — that is what the separate
+       token is for. */
+    text-decoration-thickness: 1px;
     text-underline-offset: 5px;
     text-decoration-color: var(--post-link-underline-color);
 }

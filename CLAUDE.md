@@ -159,6 +159,20 @@ column. Narrative tags are listed in `NARRATIVE_TAGS` in `js/theme.js`; that lis
   It counts text, not markup, so it also trips on tag names written inside HTML comments. Both
   failure modes are false positives — confirm with `grep -n` before "fixing" anything.
 - Verify JS with `node --check js/theme.js` and `node js/theme.test.js` before committing.
+- **Check that every `var(--x)` resolves.** A misspelled custom property does not error — it falls
+  back to the initial value, so the rule appears to do nothing for no visible reason. This caught a
+  real bug where `--post-link-underline-color` was referenced but `--link-underline-color` defined:
+  ```bash
+  comm -13 <(grep -oh -- '--[a-z-]*:' css/*.css | sed 's/:$//' | sort -u) \
+           <(grep -oh 'var(--[a-z-]*' css/*.css | sed 's/var(//' | sort -u)
+  ```
+  Prints nothing when clean; any line is a token referenced but never defined.
+- **Colour fields must be wired twice.** Every `<meta name="color:X">` in `theme.html` needs a
+  matching entry in the inline `<style>` block, or the picker appears in Tumblr and does nothing:
+  ```bash
+  diff <(grep -o 'name="color:[^"]*"' theme.html | sed 's/name="color://;s/"//' | sort) \
+       <(sed -n '/<style>/,/<\/style>/p' theme.html | grep -o '{color:[^}]*}' | sed 's/{color://;s/}//' | sort)
+  ```
 
 ## Reference themes
 

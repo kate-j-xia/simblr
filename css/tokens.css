@@ -14,7 +14,6 @@
        out of these and stay muted; they are chrome, not content. */
     --link-color: #f08dbd;
     --link-hover-color: #f08dbd;
-    --link-underline-color: #f08dbd;
 
     /* Links written inside post copy — captions, text posts, reblog
        commentary, asks, chat. These are underlined, because a link buried mid
@@ -22,6 +21,13 @@
        (username, date, tags) keep --link-color and stay undecorated. */
     --post-link-color: #c2185b;
     --post-link-hover-color: #f08dbd;
+
+    /* The underline is coloured independently of the text so it can sit back a
+       shade — a full-strength rule under 12px Lora reads heavier than the word
+       it marks. Must be named exactly as posts.css references it: an unknown
+       custom property does not error, it falls back to currentColor, and the
+       underline silently matches the text again. */
+    --post-link-underline-color: #f08dbd;
 
     /* The post button row is styled independently of links so the icons can
        read as controls rather than as more links. --icon-active-color is the
