@@ -48,7 +48,7 @@ hr {
 
 a {
     color: var(--link-color);
-    text-decoration: underline;
+    text-decoration: none;
     transition: color .3s linear;
 }
 
