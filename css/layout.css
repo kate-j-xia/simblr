@@ -196,7 +196,7 @@ section.posts:not(.grid) {
 }
 
 section.posts.grid {
-    max-width: 800px;
+    max-width: var(--grid-width);
 }
 
 section.posts:not(.grid) article.posts {
@@ -218,6 +218,23 @@ section.posts[data-page-kind="permalink"]:not(.grid) article.posts {
     padding: 50px 0 0 0;
     color: var(--muted-text-color);
     border-top: 1px solid var(--border-color);
+    /* ref.html folds its footer into the same uppercase heading treatment it
+       gives post titles and .when — see the shared rule at the top of
+       posts.css. Restated here rather than added to that selector list so
+       pagination stays owned by this file; both read --heading-font, so they
+       cannot drift apart on size or family.
+       font-weight is reset because --heading-font carries 600, and only
+       .current is meant to be bold. */
+    font: var(--heading-font);
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* In grid mode there is no rail, but the footer still has to stop where the
+   right-hand column stops, or it overhangs the grid by ~90px. */
+section.posts.grid ~ .pagination {
+    max-width: var(--grid-width);
 }
 
 /* In list mode the feed is inset past its rail, so pagination must match or
@@ -233,6 +250,27 @@ section.posts:not(.grid) ~ .pagination {
     display: inline-block;
     margin: 0 10px;
     color: var(--muted-text-color);
+}
+
+.pagination a:hover {
+    color: var(--link-hover-color);
+}
+
+/* Floated right, which is why it precedes .page-nav in the markup. */
+.page-steps {
+    float: right;
+    text-align: right;
+}
+
+/* Nothing follows it, so the trailing margin would push it off the rail. */
+.page-steps a:last-of-type {
+    margin-right: 0;
+}
+
+/* The page you are on: not a link, and the one weighted item in the row. */
+.pagination .current {
+    color: var(--title-color);
+    font-weight: 600;
 }
 
 /* -- grid ------------------------------------------------------------ */

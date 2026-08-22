@@ -357,10 +357,23 @@
 
             <!------ PAGINATION ------>
 
+            {block:Pagination}
             <footer class="pagination">
-                {block:PreviousPage}<a href="{PreviousPage}">{lang:Previous page}</a>{/block:PreviousPage}
-                {block:NextPage}<a href="{NextPage}">{lang:Next page}</a>{/block:NextPage}
+                <!-- .page-steps is floated right, so it must come FIRST in
+                     source or it drops below the numbers. -->
+                <span class="page-steps">
+                    {block:PreviousPage}<a href="{PreviousPage}">previous page</a>{block:NextPage}/{/block:NextPage}{/block:PreviousPage}
+                    {block:NextPage}<a href="{NextPage}">next page</a>{/block:NextPage}
+                </span>
+                <span class="page-nav">
+                    navigation
+                    {block:JumpPagination length="5"}
+                        {block:CurrentPage}<a class="current">{PageNumber}</a>{/block:CurrentPage}
+                        {block:JumpPage}<a class="jump" href="{URL}">{PageNumber}</a>{/block:JumpPage}
+                    {/block:JumpPagination}
+                </span>
             </footer>
+            {/block:Pagination}
                 
         </main>
 

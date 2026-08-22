@@ -45,4 +45,9 @@
     /* Left offset clearing the fixed sidebar, and the rail inset inside it. */
     --feed-offset: 375px;
     --rail-inset: 100px;
+
+    /* Width of the grid container. Two calc(50% - 40px) columns plus the 80px
+       gutter, which reproduces ref2.html's 360px card. Pagination reads this
+       too, so the two stay flush. */
+    --grid-width: 800px;
 }
