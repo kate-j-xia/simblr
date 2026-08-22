@@ -179,24 +179,45 @@
 
 /* -- posts container ------------------------------------------------------ */
 
+/* The rail — the hairline border plus the 100px inset — belongs to both
+   layouts. Because it lives here rather than on the list-only rule, the first
+   grid column and the list post text both begin at the same x, and the border
+   reads as the page's left margin instead of a list-mode decoration. */
 section.posts {
     margin: 0 0 0 var(--feed-offset);
     padding-top: 150px;
+    padding-left: var(--rail-inset);
+    border-left: 1px solid var(--border-color);
     min-height: calc(100vh - 150px);
     position: relative;
 }
 
-/* The rail is a one-column device. In grid mode it would sit far left of the
-   right-hand column and read as an accident, so it is list-mode only —
-   js/theme.js adds .grid to this element when grid layout is active. */
 section.posts:not(.grid) {
     width: var(--post-width);
-    padding-left: var(--rail-inset);
-    border-left: 1px solid var(--border-color);
 }
 
+/* The grid gets the same rail, but it CANNOT use padding to do it.
+   Masonry absolutely-positions its items, so their `50%` resolves against this
+   element's padding box, while .grid__col-sizer is static and resolves against
+   the content box. Horizontal padding makes those two boxes differ, the sizer
+   silently stops matching the item width, and the grid overflows to the right.
+   So the inset is margin here, and the rail is drawn by a pseudo-element.
+   The +1px keeps the content edge level with list mode, which is pushed over
+   by its own border. */
 section.posts.grid {
+    margin-left: calc(var(--feed-offset) + var(--rail-inset) + 1px);
+    padding-left: 0;
+    border-left: 0;
     max-width: var(--grid-width);
+}
+
+section.posts.grid:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(-1 * var(--rail-inset) - 1px);
+    border-left: 1px solid var(--border-color);
 }
 
 section.posts:not(.grid) article.posts {
@@ -215,9 +236,11 @@ section.posts[data-page-kind="permalink"]:not(.grid) article.posts {
     position: relative;
     display: block;
     margin: -50px 0 150px var(--feed-offset);
-    padding: 50px 0 0 0;
+    padding: 50px 0 0 var(--rail-inset);
     color: var(--muted-text-color);
     border-top: 1px solid var(--border-color);
+    /* Continues the feed's rail, forming the L that ref.html's footer has. */
+    border-left: 1px solid var(--border-color);
     /* ref.html folds its footer into the same uppercase heading treatment it
        gives post titles and .when — see the shared rule at the top of
        posts.css. Restated here rather than added to that selector list so
@@ -231,19 +254,14 @@ section.posts[data-page-kind="permalink"]:not(.grid) article.posts {
     letter-spacing: 1.5px;
 }
 
-/* In grid mode there is no rail, but the footer still has to stop where the
-   right-hand column stops, or it overhangs the grid by ~90px. */
+/* The footer has to stop where the right-hand column stops, or it overhangs
+   the grid by ~90px. */
 section.posts.grid ~ .pagination {
     max-width: var(--grid-width);
 }
 
-/* In list mode the feed is inset past its rail, so pagination must match or
-   Previous/Next hang 100px to the left of the post text above them. */
 section.posts:not(.grid) ~ .pagination {
-    padding-left: var(--rail-inset);
     width: var(--post-width);
-    /* Continues the feed's rail, forming an L with the border-top above. */
-    border-left: 1px solid var(--border-color);
 }
 
 .pagination a {
@@ -383,6 +401,18 @@ section.posts.is-loaded {
         padding-left: 0;
         padding-top: 25px;
         border-left: 0;
+    }
+
+    /* section.posts.grid is 0-2-1, so the unqualified reset above cannot reach
+       it — without this the grid keeps its desktop 476px margin, collapses to
+       zero width, and the page scrolls sideways. */
+    section.posts.grid {
+        margin: 0 25px;
+        max-width: none;
+    }
+
+    section.posts.grid:before {
+        display: none;
     }
 
     section.posts:not(.grid) article.posts {
