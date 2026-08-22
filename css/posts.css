@@ -313,13 +313,15 @@ section.posts.grid .q:after {
     color: var(--muted-text-color);
     font: var(--heading-font);
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    /* The row is glyphs only, so the tracking the rest of the footer uses just
+       strands them further apart. */
+    letter-spacing: 0;
 }
 
 .post-btns a,
 .post-btns .like-btn {
     display: inline-block;
-    margin-right: 12px;
+    margin-right: 7px;
     color: var(--muted-text-color);
     cursor: pointer;
 }
@@ -333,13 +335,13 @@ section.posts.grid .q:after {
    at a 12px body is twice the footer text. This must stay specific enough to
    beat it — see the "avatars are huge" note in CLAUDE.md for the same failure. */
 .post-btns .post-icon {
-    font-size: 1.4em;
+    font-size: 1.7em;
     vertical-align: middle;
     line-height: 1;
     /* GRAD -25 lightens the stroke against white. The font request in
-       theme.html's <head> must carry this same wght — an out-of-range value is
-       silently clamped, so changing it here alone does nothing. */
-    font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' -25, 'opsz' 24;
+       theme.html's <head> serves wght 200..300 — a value outside that range is
+       silently clamped, so widen the URL before nudging this past 300. */
+    font-variation-settings: 'FILL' 0, 'wght' 250, 'GRAD' -25, 'opsz' 24;
     transition: font-variation-settings .2s ease, color .3s linear;
 }
 
@@ -372,7 +374,7 @@ section.posts.grid .q:after {
    same glyph — rather than swapping to a second icon — is why the cloud is a
    variable font: FILL animates from outline to solid. */
 .post-btns .like-btn .liked ~ .icon-like {
-    font-variation-settings: 'FILL' 1, 'wght' 200, 'GRAD' -25, 'opsz' 24;
+    font-variation-settings: 'FILL' 1, 'wght' 250, 'GRAD' -25, 'opsz' 24;
     color: var(--link-hover-color);
 }
 
