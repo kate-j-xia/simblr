@@ -348,7 +348,7 @@ section.posts.grid .q:after {
 /* cheer is mostly negative space, so it reads smaller and lighter than the
    other two at identical settings. Nudged up to match them optically. */
 .post-btns .icon-reblog {
-    font-size: 2.2em;
+    font-size: 2.0em;
     font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' -25, 'opsz' 24;
 }
 
