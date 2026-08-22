@@ -321,7 +321,7 @@ section.posts.grid .q:after {
 .post-btns a,
 .post-btns .like-btn {
     display: inline-block;
-    margin-right: 7px;
+    margin-right: 12px;
     color: var(--muted-text-color);
     cursor: pointer;
 }
@@ -335,7 +335,7 @@ section.posts.grid .q:after {
    at a 12px body is twice the footer text. This must stay specific enough to
    beat it — see the "avatars are huge" note in CLAUDE.md for the same failure. */
 .post-btns .post-icon {
-    font-size: 1.7em;
+    font-size: 1.5em;
     vertical-align: middle;
     line-height: 1;
     /* GRAD -25 lightens the stroke against white. The font request in
@@ -344,15 +344,6 @@ section.posts.grid .q:after {
     font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' -25, 'opsz' 24;
     transition: font-variation-settings .2s ease, color .3s linear;
 }
-
-/* .post-btns .icon-reblog {
-    font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' -25, 'opsz' 24;
-} */
-
-/* The star's long unbroken strokes also read thin; weight only, size is fine. */
-/* .post-btns .icon-like {
-    font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' -25, 'opsz' 24;
-} */
 
 /* -- like button ----------------------------------------------------------- */
 
