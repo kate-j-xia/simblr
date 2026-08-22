@@ -237,16 +237,16 @@ section.posts:not(.grid) ~ .pagination {
    containerWidth / (colSizer + gutter), so a plain 50% here plus a gutter
    overflows and collapses to a single column. */
 .grid__col-sizer {
-    width: calc(50% - 20px);
+    width: calc(30% - 100px);
 }
 
 .grid__gutter-sizer {
-    width: 200px;
+    width: 100px;
 }
 
 .grid .grid__item {
-    width: calc(30% - 20px);
-    margin-bottom: 100px;
+    width: calc(30% - 100px);
+    margin-bottom: 300px;
 }
 
 /* Deliberately NOT setting `.grid .grid__item img { width: 100% }` here: it
