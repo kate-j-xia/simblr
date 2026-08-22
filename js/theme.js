@@ -78,8 +78,18 @@ function getPostsToHide(posts) {
 // string: it still equals itself and can never collide with a real key.
 function getTumblrImageKey(src) {
     if (typeof src !== 'string' || src === '') return '';
-    const match = src.match(/^https?:\/\/[^/]*media\.tumblr\.com\/([^/]+)\//);
-    return match ? match[1] : src;
+    const match = src.match(/^https?:\/\/[^/]*media\.tumblr\.com\/(.+)$/);
+    if (!match) return src;
+
+    const path = match[1];
+    // Modern form: /<hash>/s500x750/filename.jpg — the first segment is the
+    // key and is already size-independent.
+    if (path.includes('/')) return path.slice(0, path.indexOf('/'));
+
+    // Legacy form: /tumblr_abc123_500.jpg — one flat segment with the size
+    // baked into it. Strip the extension and the trailing size token, or the
+    // same photo at two sizes yields two keys and the duplicate survives.
+    return path.replace(/\.[a-z0-9]+$/i, '').replace(/_[0-9]+(sq)?$/i, '');
 }
 
 // On a reblogged photo post Tumblr renders the photo twice: once through

@@ -163,3 +163,29 @@ assert.deepStrictEqual([...getDuplicateTrailImages(null, null)], []);
 assert.deepStrictEqual([...getDuplicateTrailImages(undefined, undefined)], []);
 
 console.log('trail dedup tests passed');
+
+// Older posts use a flat filename whose size is baked into the last segment,
+// e.g. tumblr_abc_500.jpg vs tumblr_abc_1280.jpg. Without stripping that
+// suffix the same photo yields two different keys and the duplicate survives.
+assert.strictEqual(
+    getTumblrImageKey('https://64.media.tumblr.com/tumblr_abc123_500.jpg'),
+    getTumblrImageKey('https://64.media.tumblr.com/tumblr_abc123_1280.jpg')
+);
+assert.strictEqual(
+    getTumblrImageKey('https://64.media.tumblr.com/tumblr_inline_xyz_540.png'),
+    getTumblrImageKey('https://64.media.tumblr.com/tumblr_inline_xyz_75sq.png')
+);
+
+// Different photos must still not collide once the suffix is stripped.
+assert.notStrictEqual(
+    getTumblrImageKey('https://64.media.tumblr.com/tumblr_abc123_500.jpg'),
+    getTumblrImageKey('https://64.media.tumblr.com/tumblr_def456_500.jpg')
+);
+
+// The modern hashed form has no size in the segment; leave it untouched.
+assert.strictEqual(
+    getTumblrImageKey('https://64.media.tumblr.com/abc123/s500x750/pic.jpg'),
+    'abc123'
+);
+
+console.log('legacy image key tests passed');
