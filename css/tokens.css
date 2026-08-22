@@ -8,8 +8,20 @@
     --primary-text-color: #111111;
     --title-color: #000000;
     --blog-title-color: #000000;
-    --link-hover-color: #f08dbd;
+    /* Links inside post content — embedded links, usernames, the date and
+       attribution in .when. Set apart from --primary-text-color so links are
+       findable in body copy. Navigation, pagination and tags deliberately opt
+       out of these and stay muted; they are chrome, not content. */
     --link-color: #f08dbd;
+    --link-hover-color: #f08dbd;
+
+    /* The post button row is styled independently of links so the icons can
+       read as controls rather than as more links. --icon-active-color is the
+       liked state, which fills the glyph as well as recolouring it. */
+    --icon-color: rgba(17, 17, 17, .6);
+    --icon-color: color-mix(in srgb, var(--primary-text-color) 60%, transparent);
+    --icon-hover-color: #f08dbd;
+    --icon-active-color: #f08dbd;
     --border-color: #f5f5f5;
     --text-border-color: #eeeeee;
     --scrollbar-color: #d5d5d5;

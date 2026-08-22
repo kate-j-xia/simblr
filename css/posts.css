@@ -94,6 +94,10 @@ ol.notes li:before {
 
 .user,
 .user a {
+    color: var(--link-color);
+}
+
+.user a:hover {
     color: var(--link-hover-color);
 }
 
@@ -261,8 +265,10 @@ section.posts.grid .q:after {
     font-weight: normal;
 }
 
+/* The date and "originally by" are the only links in the footer, so they take
+   the link colour. The surrounding .when text stays muted. */
 .when a {
-    color: var(--muted-text-color);
+    color: var(--link-color);
 }
 
 .when a:hover {
@@ -310,7 +316,7 @@ section.posts.grid .q:after {
    background, no hover fill. */
 .post-btns {
     margin-top: 10px;
-    color: var(--muted-text-color);
+    color: var(--icon-color);
     font: var(--heading-font);
     text-transform: uppercase;
     /* The row is glyphs only, so the tracking the rest of the footer uses just
@@ -322,13 +328,13 @@ section.posts.grid .q:after {
 .post-btns .like-btn {
     display: inline-block;
     margin-right: 12px;
-    color: var(--muted-text-color);
+    color: var(--icon-color);
     cursor: pointer;
 }
 
 .post-btns a:hover,
 .post-btns .like-btn:hover {
-    color: var(--link-hover-color);
+    color: var(--icon-hover-color);
 }
 
 /* Google's own .material-symbols-outlined rule hardcodes font-size: 24px, which
@@ -375,7 +381,7 @@ section.posts.grid .q:after {
    variable font: FILL animates from outline to solid. */
 .post-btns .like-btn .liked ~ .icon-like {
     font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' -25, 'opsz' 24;
-    color: var(--link-hover-color);
+    color: var(--icon-active-color);
 }
 
 /* -- notes ------------------------------------------------------------ */
