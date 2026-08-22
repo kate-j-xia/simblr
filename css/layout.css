@@ -52,7 +52,6 @@
     margin: 0 0 25px 0;
     height: 40px;
     width: 40px;
-    border-radius: 100%;
 }
 
 #sidebar-left .description {
@@ -242,12 +241,12 @@ section.posts:not(.grid) ~ .pagination {
 }
 
 .grid__gutter-sizer {
-    width: 40px;
+    width: 200px;
 }
 
 .grid .grid__item {
     width: calc(50% - 20px);
-    margin-bottom: 40px;
+    margin-bottom: 100px;
 }
 
 /* Deliberately NOT setting `.grid .grid__item img { width: 100% }` here: it

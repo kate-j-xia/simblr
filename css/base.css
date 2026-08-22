@@ -47,7 +47,7 @@ hr {
 /* -- links ------------------------------------------------------------ */
 
 a {
-    color: var(--primary-text-color);
+    color: var(--link-color);
     text-decoration: none;
     transition: color .3s linear;
 }
