@@ -44,6 +44,10 @@
     text-transform: uppercase;
     letter-spacing: 2.5px;
     font: var(--heading-font);
+    /* Must follow the font shorthand, which would otherwise reset it.
+       ref.html sets its blog title (.tai) a shade larger than the shared
+       heading scale used for post titles. */
+    font-size: .85em;
     color: var(--blog-title-color);
 }
 
@@ -192,11 +196,17 @@ section.posts:not(.grid) {
 }
 
 section.posts.grid {
-    max-width: 900px;
+    max-width: 800px;
 }
 
 section.posts:not(.grid) article.posts {
     padding-bottom: 150px;
+}
+
+/* ref.html cuts this to 50px on permalinks: there is no next post to separate
+   from, so the full 150px just strands the notes list below. */
+section.posts[data-page-kind="permalink"]:not(.grid) article.posts {
+    padding-bottom: 50px;
 }
 
 /* -- pagination ------------------------------------------------------------ */
@@ -204,7 +214,7 @@ section.posts:not(.grid) article.posts {
 .pagination {
     position: relative;
     display: block;
-    margin: 0 0 150px var(--feed-offset);
+    margin: -50px 0 150px var(--feed-offset);
     padding: 50px 0 0 0;
     color: var(--muted-text-color);
     border-top: 1px solid var(--border-color);
@@ -221,7 +231,7 @@ section.posts:not(.grid) ~ .pagination {
 
 .pagination a {
     display: inline-block;
-    margin: 0 10px 0 0;
+    margin: 0 10px;
     color: var(--muted-text-color);
 }
 
@@ -236,17 +246,22 @@ section.posts:not(.grid) ~ .pagination {
 /* Must match .grid__item width exactly: Masonry fits columns as
    containerWidth / (colSizer + gutter), so a plain 50% here plus a gutter
    overflows and collapses to a single column. */
+/* ref2.html spaces its grid with 40px of padding inside each card, so the gap
+   between two cards' content is 80px. We keep a real gutter instead — it
+   preserves full-bleed images and leaves cards styleable — so that same 80px
+   is expressed as the gutter itself. */
 .grid__col-sizer {
-    width: calc(40% - 100px);
+    width: calc(50% - 40px);
 }
 
 .grid__gutter-sizer {
-    width: 100px;
+    width: 80px;
 }
 
 .grid .grid__item {
-    width: calc(40% - 100px);
-    margin-bottom: 100px;
+    width: calc(50% - 40px);
+    /* Matches the gutter, so vertical and horizontal gaps read the same. */
+    margin-bottom: 80px;
 }
 
 /* Deliberately NOT setting `.grid .grid__item img { width: 100% }` here: it
