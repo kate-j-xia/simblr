@@ -329,11 +329,54 @@ section.posts.grid .q:after {
     color: var(--link-hover-color);
 }
 
-/* Material Icons ship at 24px; scale to sit inline with the footer text. */
-.post-icon {
-    font-size: 1.2em;
+/* Google's own .material-symbols-outlined rule hardcodes font-size: 24px, which
+   at a 12px body is twice the footer text. This must stay specific enough to
+   beat it — see the "avatars are huge" note in CLAUDE.md for the same failure. */
+.post-btns .post-icon {
+    font-size: 1.4em;
     vertical-align: middle;
     line-height: 1;
+    /* GRAD -25 lightens the stroke against white; wght is set per icon below
+       because left_click needs more weight than cloud and cheer to read. */
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' -25, 'opsz' 24;
+    transition: font-variation-settings .2s ease, color .3s linear;
+}
+
+.post-btns .icon-permalink {
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' -25, 'opsz' 24;
+}
+
+/* -- like button ----------------------------------------------------------- */
+
+/* {LikeButton} renders Tumblr's own control, which cannot be restyled. So it is
+   stretched invisibly over the cloud glyph: Tumblr still handles the click and
+   the like state, but what the reader sees is our icon.
+   NOTE: this can only be verified inside Tumblr — the harness has no
+   {LikeButton}, so the overlay and the .liked state are untested locally. */
+.post-btns .like-btn {
+    position: relative;
+    display: inline-block;
+}
+
+.post-btns .like-btn .like_button,
+.post-btns .like-btn iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+    cursor: pointer;
+    border: 0;
+}
+
+/* Tumblr adds .liked to its own wrapper once the post is liked. Filling the
+   same glyph — rather than swapping to a second icon — is why the cloud is a
+   variable font: FILL animates from outline to solid. */
+.post-btns .like-btn .liked ~ .icon-like {
+    font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' -25, 'opsz' 24;
+    color: var(--link-hover-color);
 }
 
 /* -- notes ------------------------------------------------------------ */

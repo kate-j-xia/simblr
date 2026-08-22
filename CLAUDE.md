@@ -110,8 +110,17 @@ column. Narrative tags are listed in `NARRATIVE_TAGS` in `js/theme.js`; that lis
   leaves the images stacked rather than throwing.
 - **Every code path out of `initLayout()` must add `.is-loaded`.** The permalink early-return once
   skipped it, so permalink pages stayed blank until the 3s failsafe fired.
-- **Icons are Material Icons**, linked in `<head>`. The post markup originally used `mageicons`
-  (from `ref3.html`) whose stylesheet was never loaded, so all six icons rendered as nothing.
+- **Icons are Material *Symbols*** (variable axes `opsz,wght,FILL,GRAD`), linked in `<head>` — not
+  the legacy Material Icons. Google's own `.material-symbols-outlined` rule hardcodes
+  `font-size: 24px`, so `.post-btns .post-icon` must stay specific enough to override it. The post
+  markup originally used `mageicons` (from `ref3.html`) whose stylesheet was never loaded, so all
+  six icons rendered as nothing — a wrong icon *name* fails the same way, as literal text.
+- **The like button is a glyph under Tumblr's control, not a button.** `{LikeButton}` renders
+  Tumblr's own widget, which can't be restyled; it's stretched invisibly over the `cloud` glyph so
+  Tumblr handles the click. The liked state fills the same glyph via `'FILL' 1` rather than
+  swapping icons. None of this can be tested outside Tumblr.
+- **Tags render on permalink pages only** (`{block:PermalinkPage}` inside `.when`), so the feed
+  stays clean while tag pages remain reachable by click. Note count is not rendered at all.
 - **`{LikeButton}` and `Tumblr.Lightbox.init(...)` can only be tested inside Tumblr.**
 
 ## Conventions

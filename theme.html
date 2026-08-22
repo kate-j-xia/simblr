@@ -52,7 +52,7 @@
         <link href="https://kate-j-xia.github.io/simblr/css/layout.css" rel="stylesheet">
         <link href="https://kate-j-xia.github.io/simblr/css/posts.css" rel="stylesheet">
         <link href="https://kate-j-xia.github.io/simblr/css/dark.css" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..500,0..1,-25" rel="stylesheet">
 
         <script defer src="https://kate-j-xia.github.io/simblr/js/vendor/masonry.pkgd.min.js"></script>
         <script defer src="https://kate-j-xia.github.io/simblr/js/vendor/imagesloaded.pkgd.min.js"></script>
@@ -267,22 +267,26 @@
                                 <span class="ca"><img src="{ReblogRootPortraitURL-40}" alt=""></span>
                                 originally by <a href="{ReblogRootURL}">{ReblogRootName}</a>
                             {/block:RebloggedFrom}
-                            {block:NoteCount}<a href="{Permalink}" class="notes-link">{NoteCount} notes</a>{/block:NoteCount}
 
+                            {block:PermalinkPage}
                             {block:HasTags}
                                 <div class="tags">
                                     <svg viewBox="0 0 216 216" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M95.2,186c1.7,0,3.2-0.6,4.3-1.7l64.8-66.7c2.3-2.4,2.3-6.1-0.1-8.4L94.7,39.7c-1.1-1.1-2.7-1.7-4.2-1.7l-67.1,0.1c-3.3,0-6,2.6-6,5.9L17,109.9c0,1.6,0.6,3.2,1.8,4.3l72.3,70.2C92.2,185.5,93.7,186,95.2,186z M29.4,50L88,49.8l63.6,63.6l-56.5,58.2L29,107.4L29.4,50z M67.1,77.7c0,4.6-3.8,8.4-8.4,8.4s-8.4-3.8-8.4-8.4c0-4.6,3.8-8.4,8.4-8.4S67.1,73.1,67.1,77.7z"/></svg>
                                     {block:Tags}<a href="{TagURL}">{Tag}</a>{/block:Tags}
                                 </div>
                             {/block:HasTags}
+                            {/block:PermalinkPage}
                         </div>
                     {/block:Date}
 
                     <!------ BUTTONS ------>
                     <div class="post-btns">
-                        <a href="{Permalink}" title="permalink"><span class="material-icons post-icon">link</span></a>
-                        <a href="{ReblogURL}" target="_blank" title="reblog"><span class="material-icons post-icon">repeat</span></a>
-                        <span class="like-btn" title="like">{LikeButton}</span>
+                        <a href="{Permalink}" title="permalink"><span class="material-symbols-outlined post-icon icon-permalink">left_click</span></a>
+                        <a href="{ReblogURL}" target="_blank" title="reblog"><span class="material-symbols-outlined post-icon icon-reblog">cheer</span></a>
+                        <span class="like-btn" title="like">
+                            {LikeButton}
+                            <span class="material-symbols-outlined post-icon icon-like">cloud</span>
+                        </span>
                     </div>
 
                 </article>

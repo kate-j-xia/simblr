@@ -56,15 +56,14 @@ const FOOTER = `
         Posted on <a href="#">August 21st, 2026</a>
         <span class="ca"><img src="${img(40, 40)}" alt=""></span>
         originally by <a href="#">someblog</a>
-        <a href="#" class="notes-link">42 notes</a>
-        <div class="tags">
+        ${params.get('kind') === 'permalink' ? `<div class="tags">
             ${TAG_SVG}<a href="#">ts2 builds</a><a href="#">download</a>
-        </div>
+        </div>` : ''}
     </div>
     <div class="post-btns">
-        <a href="#" title="permalink"><span class="material-icons post-icon">link</span></a>
-        <a href="#" title="reblog"><span class="material-icons post-icon">repeat</span></a>
-        <span class="like-btn" title="like"><span class="material-icons post-icon">favorite_border</span></span>
+        <a href="#" title="permalink"><span class="material-symbols-outlined post-icon icon-permalink">left_click</span></a>
+        <a href="#" title="reblog"><span class="material-symbols-outlined post-icon icon-reblog">cheer</span></a>
+        <span class="like-btn" title="like"><span class="material-symbols-outlined post-icon icon-like">cloud</span></span>
     </div>`;
 
 POSTS.forEach((body, i) => {
