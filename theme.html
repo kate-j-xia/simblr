@@ -14,7 +14,17 @@
         <!------ THEME OPTIONS ------>
 
         <meta name="image:Sidebar image" content="">
+
+        <!-- These feed the :root tokens via the inline <style> below. Adding a
+             new colour here also means adding it there, and re-pasting this
+             file into Tumblr — the stylesheets on GitHub Pages cannot see
+             customizer values. -->
+        <meta name="color:Background" content="#ffffff">
+        <meta name="color:Text" content="#111111">
+        <meta name="color:Title" content="#000000">
+        <meta name="color:Blog title" content="#000000">
         <meta name="color:Link hover" content="#f08dbd">
+        <meta name="color:Borders" content="#f5f5f5">
         <meta name="select:Font size" content="9px" title="9px">
         <meta name="select:Font size" content="10px" title="10px">
         <meta name="select:Font size" content="11px" title="11px">
@@ -47,6 +57,26 @@
 
         <!-- tokens.css must load first: every other sheet reads its variables. -->
         <link href="https://kate-j-xia.github.io/simblr/css/tokens.css" rel="stylesheet">
+
+        <!-- The ONLY CSS that belongs in this file. Tumblr substitutes
+             {color:...} here but never inside the stylesheets above, which it
+             serves untouched from GitHub Pages — so this block is the only
+             bridge between the Customize panel and the token system.
+
+             Position matters. It must sit AFTER tokens.css (to override the
+             defaults) and BEFORE dark.css (so a dark palette still wins). Both
+             use :root, so at equal specificity document order decides. -->
+        <style>
+            :root {
+                --primary-bg-color: {color:Background};
+                --primary-text-color: {color:Text};
+                --title-color: {color:Title};
+                --blog-title-color: {color:Blog title};
+                --link-hover-color: {color:Link hover};
+                --border-color: {color:Borders};
+            }
+        </style>
+
         <link href="https://kate-j-xia.github.io/simblr/css/base.css" rel="stylesheet">
         <link href="https://kate-j-xia.github.io/simblr/css/layout.css" rel="stylesheet">
         <link href="https://kate-j-xia.github.io/simblr/css/posts.css" rel="stylesheet">

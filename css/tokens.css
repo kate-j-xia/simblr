@@ -13,10 +13,20 @@
     --text-border-color: #eeeeee;
     --scrollbar-color: #d5d5d5;
 
-    /* Muted text is the RGB of --primary-text-color at 60%. If you change
-       --primary-text-color, change these two to match. */
+    /* Muted text is --primary-text-color at reduced opacity. These derive
+       themselves via color-mix, so they follow the text colour automatically —
+       including when it is set from Tumblr's Customize panel, which the inline
+       <style> in theme.html feeds into --primary-text-color above.
+
+       The rgba line is a fallback for browsers without color-mix (pre-2023);
+       they ignore the declaration they cannot parse and keep it. It assumes
+       the default #111111, so on an old browser a customized text colour will
+       not reach the muted variants. */
     --muted-text-color: rgba(17, 17, 17, .6);
+    --muted-text-color: color-mix(in srgb, var(--primary-text-color) 60%, transparent);
+
     --quiet-text-color: rgba(17, 17, 17, .75);
+    --quiet-text-color: color-mix(in srgb, var(--primary-text-color) 75%, transparent);
 
     /* -- type ------------------------------------------------------------ */
 

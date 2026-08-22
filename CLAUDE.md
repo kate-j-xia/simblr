@@ -54,6 +54,14 @@ served raw from GitHub Pages. A `{select:font size}` in a stylesheet is dead tex
 `ref*.html` uses that syntax heavily; every one must become a `:root` token when ported. Check with:
 `grep -n '{[a-zA-Z]*:' css/*.css`
 
+**The one exception — the customizer bridge.** `theme.html` carries a single inline `<style>` block
+that assigns `{color:...}` values to the `:root` tokens. It is the *only* place Tumblr's Customize
+panel can reach the token system, precisely because `theme.html` is the only templated file. It
+must stay **after `tokens.css`** (to override defaults) and **before `dark.css`** (so a dark palette
+still wins). Adding a colour means editing both the `<meta name="color:...">` list and that block,
+then re-pasting `theme.html` — a palette tweak to an *existing* field needs neither a push nor a
+re-paste.
+
 **Hosting:** GitHub Pages is live at `https://kate-j-xia.github.io/simblr/`, serving `main` at
 root. Linked CSS/JS changes only reach the blog after merging to `main` — feature-branch work
 won't show up in Tumblr.
@@ -83,7 +91,10 @@ won't show up in Tumblr.
   - `css/layout.css` — sidebars, posts container and rail, Masonry grid, pagination, responsive.
   - `css/posts.css` — post-card internals (titles, media, photoset rows, trail, tags, `.when`,
     asks, chat, notes).
-  - `css/dark.css` — empty. Dark mode not started; it should only need to override tokens.
+  - `css/dark.css` — no rules yet. Dark mode should only need to override tokens. **Scope them
+    `:root[data-theme="dark"]`**, not a bare `[data-theme="dark"]`: the latter ties with the
+    customizer block in `theme.html` at 0-1-0 and loses on document order, so dark mode renders
+    light with no error. Verified — the bare selector genuinely fails. The file explains this.
 - **`dev/preview.html`** — local harness. Never linked from `theme.html`.
 
 Layout defaults: home → grid, catalog tag → grid, narrative tag → one column, permalink → one
