@@ -269,8 +269,9 @@ section.posts.grid .q:after {
     color: var(--link-hover-color);
 }
 
-/* The reblog-root portrait, sized to sit inline with the date text. Without
-   this the grid's img{width:100%} rule blows it up to full card width. */
+/* The reblog-root portrait, sized to sit inline with the date text. A blanket
+   full-width image rule in layout.css would outrank this and blow the avatar
+   up to full card width — see the note there. */
 .when img {
     width: 1.4em;
     height: 1.4em;

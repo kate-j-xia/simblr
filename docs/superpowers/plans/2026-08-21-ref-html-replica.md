@@ -10,6 +10,67 @@
 
 **Spec:** `docs/superpowers/specs/2026-08-21-ref-html-replica-design.md`
 
+## Progress — read this first
+
+**Tasks 1–7 are done and committed** on branch `base-grid`, through commit `764b339`.
+**Resume at Task 8** (vanilla photoset row layout), then Task 9.
+
+Nothing has been pushed. `main` is 18 commits ahead of `origin/main` and `base-grid` is ahead of
+`main` — see "How to resume" below for the exact sequence.
+
+### Verified working in the local harness (`dev/preview.html`, desktop 1280px)
+
+- Grid mode: two columns at x=375 and x=842, 427px each. Masonry positions via percentage `left`,
+  not `transform` — measure with `getBoundingClientRect()` *after* layout settles, or you will
+  misread a race as a broken grid.
+- List mode: rail at 100px inset, feed width 500px, pagination text aligned to the post text at
+  476px (both clear the 1px rail border).
+- Post cards match `ref.html`: uppercase letter-spaced title with a full-measure underline, Lora
+  body copy, muted uppercase `.when` footer, 17px round inline avatar, tag glyph + tags, and the
+  three-icon button row rendering as real Material Icons.
+
+### Deviations from the plan as written
+
+1. **Tasks 4–7 were committed as one commit (`764b339`), not four.** The old ref3 wrappers
+   interleaved (header → date → body → footer), so a staged replacement would have left the
+   template malformed between commits for no review benefit.
+2. **`.grid .grid__item img { width: 100% }` was deleted from `layout.css`.** It has specificity
+   0-2-1 and outranked `posts.css`'s `.when img` (0-1-1), so the footer avatar stayed full card
+   width — the original complaint. Post image sizing is now entirely `posts.css`'s job
+   (`.ph > img`, `.ph > a > img`, `.photo-row img`). **Do not reintroduce a blanket `img` rule in
+   `layout.css`.**
+3. **Pagination gained a list-mode rail.** Task 3 as written left pagination 100px left of the
+   post text. Fixed with `section.posts:not(.grid) ~ .pagination`, which adds `padding-left` and a
+   `border-left`, forming the L that `ref.html`'s footer has. Relies on `.pagination` being a
+   *sibling following* `section.posts` — it is, at the end of the template.
+4. **A duplicate `{block:PostNotes}` block was removed** from `theme.html`. It was present twice
+   and would have rendered the notes list twice on permalink pages. Pre-existing, unrelated to
+   this plan.
+5. **`.claude/launch.json` was added** so the preview harness can be served over HTTP
+   (`python3 -m http.server 8765`) rather than `file://`, which is what the preview tooling needs.
+
+### How to resume
+
+```bash
+cd /Users/kate/projects/simblr
+git checkout base-grid          # already there; 764b339 is the tip
+node js/theme.test.js           # layout + dedup tests should pass
+python3 -m http.server 8765     # then open http://localhost:8765/dev/preview.html
+```
+
+Then work Task 8, then Task 9. Task 9 Step 10 is the publish step — **that is the only step that
+touches the live blog**, and pushing is the user's call, not the agent's.
+
+### Known issues / not yet verified
+
+- **Photosets are still stacked, not in rows.** That is Task 8, the next task.
+- **Nothing has been seen inside Tumblr yet.** `{LikeButton}`, `{PostNotes}`, `Tumblr.Lightbox`,
+  and real photoset markup cannot be exercised by the harness.
+- **`{block:Answer}` uses `{Replies}`**, carried over from `ref.html`. Unverified against current
+  Tumblr templating — check it renders on a real ask post.
+- The harness's Material Icons briefly render as ligature text (`link repeat favorite_border`)
+  before the icon font loads. Cosmetic, harness-only.
+
 ## Global Constraints
 
 - No new build tooling, package manager, or test framework.
@@ -26,7 +87,7 @@
 
 ---
 
-### Task 1: Rebuild the local preview harness
+### Task 1: Rebuild the local preview harness  ✅ DONE
 
 **Files:**
 - Create: `dev/preview.html`
@@ -40,7 +101,7 @@
 
 The harness mimics *Tumblr's rendered output*, not `theme.html`'s template source. It must reproduce the two attributes `js/theme.js` reads (`data-page-kind`, `data-tag` on `section.posts`) and the sizer divs Masonry measures.
 
-- [ ] **Step 1: Create the dev directory and the harness page**
+- [x] **Step 1: Create the dev directory and the harness page**
 
 Create `dev/preview.html`:
 ```html
@@ -96,7 +157,7 @@ Create `dev/preview.html`:
 
 Note the scripts are NOT `defer` here and `fixtures.js` runs before `theme.js`: the fixtures must be in the DOM before `theme.js` measures them.
 
-- [ ] **Step 2: Create the fixture data**
+- [x] **Step 2: Create the fixture data**
 
 Create `dev/fixtures.js`:
 ```javascript
@@ -164,7 +225,7 @@ POSTS.forEach((body, i) => {
 });
 ```
 
-- [ ] **Step 3: Document the harness**
+- [x] **Step 3: Document the harness**
 
 Create `dev/README.md`:
 ```markdown
@@ -192,18 +253,18 @@ What it CANNOT show: `{LikeButton}`, `{PostNotes}`, `Tumblr.Lightbox`, and real
 photoset markup. Those only exist inside Tumblr.
 ```
 
-- [ ] **Step 4: Ensure dev/ is not served as part of the theme**
+- [x] **Step 4: Ensure dev/ is not served as part of the theme**
 
 Confirm nothing links to `dev/`:
 
 Run: `grep -rn "dev/" theme.html css/ js/ || echo "clean"`
 Expected: prints `clean`.
 
-- [ ] **Step 5: Manual verification**
+- [x] **Step 5: Manual verification**
 
 Open `dev/preview.html` in a browser. Expected at this point: an unstyled-but-populated page — the CSS files for `tokens`/`layout`/`posts` don't exist yet (Task 2 creates them), so those `<link>`s 404 harmlessly. Six placeholder posts and the sidebar must be visible. This is the baseline the next tasks improve.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add dev/ && git commit -m "Add local preview harness for CSS/JS verification"
@@ -211,7 +272,7 @@ cd /Users/kate/projects/simblr && git add dev/ && git commit -m "Add local previ
 
 ---
 
-### Task 2: Split the CSS into concern-scoped files and adopt Lora + Lato
+### Task 2: Split the CSS into concern-scoped files and adopt Lora + Lato  ✅ DONE
 
 **Files:**
 - Create: `css/tokens.css`
@@ -228,7 +289,7 @@ cd /Users/kate/projects/simblr && git add dev/ && git commit -m "Add local previ
 
 `ref.html`'s customizer defaults (its `<meta name="color:...">` tags) supply the values. Two deliberate departures, both carried over from the earlier port: `--primary-text-color` stays `#111111` rather than `ref.html`'s `#cccccc` (which is near-invisible on white), and `--link-hover-color` stays this project's `#f08dbd` rather than `ref.html`'s `#eeeeee`.
 
-- [ ] **Step 1: Create the token file**
+- [x] **Step 1: Create the token file**
 
 Create `css/tokens.css`:
 ```css
@@ -269,7 +330,7 @@ Create `css/tokens.css`:
 }
 ```
 
-- [ ] **Step 2: Reduce base.css to reset, typography, links, and scrollbar**
+- [x] **Step 2: Reduce base.css to reset, typography, links, and scrollbar**
 
 Replace the entire contents of `css/base.css` with:
 ```css
@@ -347,7 +408,7 @@ a:hover {
 }
 ```
 
-- [ ] **Step 3: Create layout.css with the sidebar, grid, toggle, and responsive rules**
+- [x] **Step 3: Create layout.css with the sidebar, grid, toggle, and responsive rules**
 
 Create `css/layout.css`. These are the sidebar/nav/grid/toggle/responsive rules moved out of the old `base.css` verbatim, minus the `.pagination` rail (Task 3 rewrites that) and minus `--muted-text-color` hardcoding:
 ```css
@@ -505,7 +566,7 @@ section.posts.is-loaded {
 }
 ```
 
-- [ ] **Step 4: Create an empty posts.css placeholder**
+- [x] **Step 4: Create an empty posts.css placeholder**
 
 Create `css/posts.css`:
 ```css
@@ -515,7 +576,7 @@ Create `css/posts.css`:
 
 Tasks 4–9 fill this in. It exists now so the `<link>` in Task 2 Step 6 resolves.
 
-- [ ] **Step 5: Swap the font link in theme.html**
+- [x] **Step 5: Swap the font link in theme.html**
 
 Find (currently around line 45):
 ```html
@@ -527,7 +588,7 @@ Replace with:
         <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 ```
 
-- [ ] **Step 6: Update the stylesheet links in theme.html**
+- [x] **Step 6: Update the stylesheet links in theme.html**
 
 Find:
 ```html
@@ -544,7 +605,7 @@ Replace with (order matters — tokens must come first):
         <link href="https://kate-j-xia.github.io/simblr/css/dark.css" rel="stylesheet">
 ```
 
-- [ ] **Step 7: Verify no template syntax leaked into the CSS**
+- [x] **Step 7: Verify no template syntax leaked into the CSS**
 
 Run:
 ```bash
@@ -552,13 +613,13 @@ cd /Users/kate/projects/simblr && grep -n '{[a-zA-Z]*:' css/*.css | grep -v '^\s
 ```
 Expected: prints `clean`. Any hit is a Tumblr tag that will never be substituted.
 
-- [ ] **Step 8: Manual verification**
+- [x] **Step 8: Manual verification**
 
 Open `dev/preview.html`. Expected: body copy now renders in Lora (a serif); the sidebar title and nav links in uppercase Lato; the grid still lays out in two columns; the toggle still switches to one column. Post internals are still unstyled — that's Tasks 4–9.
 
 **Expected transient regression:** the old `section.posts { margin-left: 375px }` rule is deliberately NOT carried into `layout.css` here — Task 3 rewrites it as part of the rail work. So between this task and Task 3, the feed sits underneath the fixed sidebar. That is expected; do not "fix" it, and do not merge to `main` in this state.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add css/ theme.html && git commit -m "Split base.css into tokens/base/layout/posts and adopt Lora + Lato"
@@ -566,7 +627,7 @@ cd /Users/kate/projects/simblr && git add css/ theme.html && git commit -m "Spli
 
 ---
 
-### Task 3: Move the rail onto the posts section and scope it to list mode
+### Task 3: Move the rail onto the posts section and scope it to list mode  ✅ DONE
 
 **Files:**
 - Modify: `css/layout.css`
@@ -578,7 +639,7 @@ cd /Users/kate/projects/simblr && git add css/ theme.html && git commit -m "Spli
 
 The rail is a one-column device: in a 2-column grid it would sit far left of the right-hand column and read as an accident. So it applies only when `section.posts` does NOT have the `.grid` class — i.e. list mode, which `js/theme.js` already toggles.
 
-- [ ] **Step 1: Replace the posts-container and pagination rules in layout.css**
+- [x] **Step 1: Replace the posts-container and pagination rules in layout.css**
 
 In `css/layout.css`, find the `/* -- grid ---- */` banner and insert this section immediately ABOVE it:
 ```css
@@ -627,7 +688,7 @@ section.posts:not(.grid) article.posts {
 }
 ```
 
-- [ ] **Step 2: Add the matching responsive overrides**
+- [x] **Step 2: Add the matching responsive overrides**
 
 In `css/layout.css`'s `@media (max-width: 700px)` block, add these rules inside the block:
 ```css
@@ -652,7 +713,7 @@ In `css/layout.css`'s `@media (max-width: 700px)` block, add these rules inside 
 
 The rail and the 375px offset both assume a fixed sidebar, which the mobile breakpoint unpins — so both are removed here.
 
-- [ ] **Step 3: Verify the old pagination rail is gone**
+- [x] **Step 3: Verify the old pagination rail is gone**
 
 Run:
 ```bash
@@ -660,11 +721,11 @@ cd /Users/kate/projects/simblr && grep -n "border-left" css/layout.css
 ```
 Expected: exactly one hit, inside the `section.posts:not(.grid)` rule. The `.pagination` rule must no longer set `border-left`.
 
-- [ ] **Step 4: Manual verification**
+- [x] **Step 4: Manual verification**
 
 Open `dev/preview.html` (grid, home): no rail, two columns, pagination flush with the feed's left edge. Click the toggle to switch to list: a hairline rail appears down the left of the feed, posts are indented 100px inside it, and pagination stays aligned with the post text. Open `dev/preview.html?kind=tag&tag=ts2-legacies`: list mode with the rail by default. Narrow below 700px: rail and offset both disappear.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add css/layout.css && git commit -m "Move ref.html rail from pagination onto section.posts, list mode only"
@@ -672,7 +733,7 @@ cd /Users/kate/projects/simblr && git add css/layout.css && git commit -m "Move 
 
 ---
 
-### Task 4: Replace the post loop — text, quote, link, and chat types
+### Task 4: Replace the post loop — text, quote, link, and chat types  ✅ DONE
 
 **Files:**
 - Modify: `theme.html` (the `{block:Posts}` loop)
@@ -685,7 +746,7 @@ cd /Users/kate/projects/simblr && git add css/layout.css && git commit -m "Move 
 
 Read `theme.html`'s current `{block:Posts}` loop before starting — the exact line numbers have shifted across tasks.
 
-- [ ] **Step 1: Replace the article opening and the text/quote/link/chat blocks**
+- [x] **Step 1: Replace the article opening and the text/quote/link/chat blocks**
 
 In `theme.html`, find the `{block:Posts}` line and everything down to (but NOT including) the `{block:Photo}` block. Replace that span with:
 ```html
@@ -750,7 +811,7 @@ In `theme.html`, find the `{block:Posts}` line and everything down to (but NOT i
                 {/block:Chat}
 ```
 
-- [ ] **Step 2: Add the title, caption, and chat CSS**
+- [x] **Step 2: Add the title, caption, and chat CSS**
 
 Append to `css/posts.css`:
 ```css
@@ -887,7 +948,7 @@ ol.chat {
 }
 ```
 
-- [ ] **Step 3: Verify block balance**
+- [x] **Step 3: Verify block balance**
 
 Run:
 ```bash
@@ -895,11 +956,11 @@ cd /Users/kate/projects/simblr && for tag in Posts Quote Source Text Title Link 
 ```
 Expected: `open` equals `close` for every tag.
 
-- [ ] **Step 4: Manual verification**
+- [x] **Step 4: Manual verification**
 
 Open `dev/preview.html`. The text post shows an uppercase letter-spaced title with a hairline rule beneath it; in list mode that rule extends left across the rail, in grid mode it stops at the card edge. The quote post renders larger with its source beneath. The chat post shows bold labels with no bullet markers.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit -m "Replace text/quote/link/chat post markup with ref.html structure"
@@ -907,7 +968,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 ---
 
-### Task 5: Replace the post loop — photo, photoset, video, and audio types
+### Task 5: Replace the post loop — photo, photoset, video, and audio types  ✅ DONE
 
 **Files:**
 - Modify: `theme.html` (the `{block:Posts}` loop)
@@ -919,7 +980,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 **Context:** `ref.html` wraps photo, photoset, and video in a shared `.media` › `.ph` container, then puts the caption below it. Audio sits outside that wrapper. Note the attribute is `data-layout`, not `layout` — the current ref3 markup uses a bare `layout` attribute, which is not valid HTML and is not what Task 8 reads.
 
-- [ ] **Step 1: Replace the media blocks**
+- [x] **Step 1: Replace the media blocks**
 
 In `theme.html`, find the span from `{block:Photo}` through the end of the `{block:Audio}` block and replace it with:
 ```html
@@ -983,7 +1044,7 @@ In `theme.html`, find the span from `{block:Photo}` through the end of the `{blo
                 {/block:Caption}
 ```
 
-- [ ] **Step 2: Add the media and audio CSS**
+- [x] **Step 2: Add the media and audio CSS**
 
 Append to `css/posts.css`:
 ```css
@@ -1058,7 +1119,7 @@ Append to `css/posts.css`:
 }
 ```
 
-- [ ] **Step 3: Verify block balance**
+- [x] **Step 3: Verify block balance**
 
 Run:
 ```bash
@@ -1066,11 +1127,11 @@ cd /Users/kate/projects/simblr && for tag in Photo Photoset Photos Video Audio A
 ```
 Expected: `open` equals `close` for every tag.
 
-- [ ] **Step 4: Manual verification**
+- [x] **Step 4: Manual verification**
 
 Open `dev/preview.html`. The photo post shows a full-width image with its caption below, attributed to `someblog`. The photoset post shows three stacked images (rows come in Task 8). No stray gap above text-only posts — if there is one, the `.media:empty` rule is not matching and the wrapper needs `{block:Photo}`-style conditioning.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit -m "Replace photo/photoset/video/audio post markup with ref.html structure"
@@ -1078,7 +1139,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 ---
 
-### Task 6: Replace the post loop — ask and answer posts
+### Task 6: Replace the post loop — ask and answer posts  ✅ DONE
 
 **Files:**
 - Modify: `theme.html` (the `{block:Posts}` loop)
@@ -1090,7 +1151,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 **Context:** `ref.html`'s ask styling is far simpler than `ref3.html`'s (`qa-set`, `ans-flex`, `que-flex`, `ans-head`). The question is an italic muted block with a full-measure rule beneath it; the answer is an ordinary `.comment`.
 
-- [ ] **Step 1: Replace the answer block**
+- [x] **Step 1: Replace the answer block**
 
 In `theme.html`, find the current `{block:Answer}` span and replace it with:
 ```html
@@ -1114,7 +1175,7 @@ In `theme.html`, find the current `{block:Answer}` span and replace it with:
                 {/block:Answer}
 ```
 
-- [ ] **Step 2: Add the ask CSS**
+- [x] **Step 2: Add the ask CSS**
 
 Append to `css/posts.css`:
 ```css
@@ -1158,7 +1219,7 @@ section.posts.grid .q:after {
 }
 ```
 
-- [ ] **Step 3: Verify block balance**
+- [x] **Step 3: Verify block balance**
 
 Run:
 ```bash
@@ -1166,11 +1227,11 @@ cd /Users/kate/projects/simblr && for tag in Answer Answerer NotReblog Reblogged
 ```
 Expected: `open` equals `close` for every tag.
 
-- [ ] **Step 4: Manual verification**
+- [x] **Step 4: Manual verification**
 
 Open `dev/preview.html`. The ask post shows "anon sent:" in lowercase followed by the italic question, a hairline rule beneath it, then the reply as normal body copy.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit -m "Replace ask/answer post markup with ref.html structure"
@@ -1178,7 +1239,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 ---
 
-### Task 7: Add the .when footer, tags, and the restyled button row
+### Task 7: Add the .when footer, tags, and the restyled button row  ✅ DONE
 
 **Files:**
 - Modify: `theme.html` (the `{block:Posts}` loop, post footer)
@@ -1192,7 +1253,7 @@ cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit
 
 `ref.html` uses an inline SVG tag glyph. Keeping it as inline SVG means no extra network request and it inherits `currentColor`.
 
-- [ ] **Step 1: Add the footer and close the article**
+- [x] **Step 1: Add the footer and close the article**
 
 In `theme.html`, find the span from the current post-footer markup through `{/block:Posts}` and replace it with:
 ```html
@@ -1234,7 +1295,7 @@ In `theme.html`, find the span from the current post-footer markup through `{/bl
         {/block:Posts}
 ```
 
-- [ ] **Step 2: Add the footer, tags, and button CSS**
+- [x] **Step 2: Add the footer, tags, and button CSS**
 
 Append to `css/posts.css`:
 ```css
@@ -1345,7 +1406,7 @@ Append to `css/posts.css`:
 }
 ```
 
-- [ ] **Step 3: Verify block balance across the whole file**
+- [x] **Step 3: Verify block balance across the whole file**
 
 Run:
 ```bash
@@ -1353,7 +1414,7 @@ cd /Users/kate/projects/simblr && for tag in Posts Date RebloggedFrom NoteCount 
 ```
 Expected: prints only `balance check done` — no MISMATCH lines.
 
-- [ ] **Step 4: Confirm no ref3 classes survive**
+- [x] **Step 4: Confirm no ref3 classes survive**
 
 Run:
 ```bash
@@ -1361,11 +1422,11 @@ cd /Users/kate/projects/simblr && grep -on 'ph-inner\|ph-left\|ph-right\|post-ou
 ```
 Expected: prints `no ref3 classes remain`.
 
-- [ ] **Step 5: Manual verification**
+- [x] **Step 5: Manual verification**
 
 Open `dev/preview.html`. Every post ends with a muted uppercase line: "Posted on August 21st, 2026 [small round avatar] originally by someblog", then a tag glyph followed by tag links, then a row of three icons. No avatar or username appears at the *top* of any post. Icons sit on the text baseline, not floating above it.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/kate/projects/simblr && git add theme.html css/posts.css && git commit -m "Add ref.html .when footer, tags, and restyled post button row"
