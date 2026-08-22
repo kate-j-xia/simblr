@@ -25,6 +25,18 @@ const POSTS = [
        </div></div></div>
      <li class="comment"><a href="#" class="user">buildblog</a>A photoset caption.</li>`,
 
+    // A reblogged photo post. Tumblr renders the photo through {block:Photo}
+    // AND again inside the root trail entry's {Body}, so the same image appears
+    // twice. removeDuplicateTrailImages() should strip the trail copy and leave
+    // only the reblogger's comment. These use one identical URL; the
+    // same-image-at-different-sizes case is covered in js/theme.test.js.
+    `<div class="media"><div class="ph"><img src="${img(500, 500)}" alt=""></div></div>
+     <li class="comment"><a href="#" class="user">originalblog</a>
+       <figure class="tmblr-full"><img src="${img(500, 500)}" alt=""></figure>
+       The original poster's caption.</li>
+     <li class="comment"><a href="#" class="user">kate</a>My reblog comment &mdash;
+       this is the only thing that should survive below the photo.</li>`,
+
     `<div class="quote title">A pull quote, set larger than body copy.</div>
      <div class="source">&mdash; someone</div>`,
 

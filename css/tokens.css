@@ -20,14 +20,17 @@
 
     /* -- type ------------------------------------------------------------ */
 
-    --body-font: normal .95em/1.6em "Lora", georgia, serif;
+    /* 12px/1.5em is ref.html's own body setting. Everything else in the theme
+       is em-relative, so this single value sets the density of the whole
+       design — headings, icons, and spacing all follow it. */
+    --body-font: normal 12px/1.5em "Lora", georgia, serif;
     --heading-font: 600 .8em/1.25em "Lato", sans-serif;
 
     /* -- metrics --------------------------------------------------------- */
 
     /* Width of a post in one-column (list) layout. Grid layout ignores this
        and uses calc(50% - 20px) so Masonry can measure it. */
-    --post-width: 500px;
+    --post-width: 420px;
 
     /* Left offset clearing the fixed sidebar, and the rail inset inside it. */
     --feed-offset: 375px;

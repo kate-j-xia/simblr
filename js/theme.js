@@ -71,6 +71,68 @@ function getPostsToHide(posts) {
     return hide;
 }
 
+// Tumblr serves the same image at many sizes, so two URLs for one photo differ
+// only in their /sWxH/ segment. The path segment right after the host is the
+// media key and is stable across sizes, which makes it usable as an identity.
+// Anything that isn't a recognizable Tumblr media URL falls back to the whole
+// string: it still equals itself and can never collide with a real key.
+function getTumblrImageKey(src) {
+    if (typeof src !== 'string' || src === '') return '';
+    const match = src.match(/^https?:\/\/[^/]*media\.tumblr\.com\/([^/]+)\//);
+    return match ? match[1] : src;
+}
+
+// On a reblogged photo post Tumblr renders the photo twice: once through
+// {block:Photo}/{block:Photoset}, and again inside the root trail entry's
+// {Body}. Returns the indices of trail images that merely echo the post's own
+// media, so they can be dropped and the trail left carrying only commentary.
+//
+// Note the asymmetry: with no media, nothing is a duplicate. Erring that way
+// means a reblogger's own added image is never removed.
+function getDuplicateTrailImages(mediaSrcs, trailSrcs) {
+    const duplicates = new Set();
+    if (!Array.isArray(mediaSrcs) || !Array.isArray(trailSrcs)) return duplicates;
+
+    const mediaKeys = new Set(
+        mediaSrcs.map(getTumblrImageKey).filter((key) => key !== '')
+    );
+    if (mediaKeys.size === 0) return duplicates;
+
+    trailSrcs.forEach((src, i) => {
+        const key = getTumblrImageKey(src);
+        if (key !== '' && mediaKeys.has(key)) duplicates.add(i);
+    });
+    return duplicates;
+}
+
+function removeDuplicateTrailImages() {
+    document.querySelectorAll('article.posts').forEach((article) => {
+        const media = Array.from(article.querySelectorAll('.ph img'));
+        const trail = Array.from(article.querySelectorAll('.comment img'));
+        if (media.length === 0 || trail.length === 0) return;
+
+        const mediaSrcs = media.map((img) => img.getAttribute('src') || '');
+        const trailSrcs = trail.map((img) => img.getAttribute('src') || '');
+
+        getDuplicateTrailImages(mediaSrcs, trailSrcs).forEach((i) => {
+            const img = trail[i];
+            // Tumblr wraps trail images in a figure/.tmblr-full. Dropping the
+            // image alone would leave that wrapper behind as dead vertical
+            // space, so take it too once it has nothing else in it.
+            const wrapper = img.parentElement;
+            img.remove();
+            if (
+                wrapper &&
+                wrapper !== article &&
+                wrapper.children.length === 0 &&
+                wrapper.textContent.trim() === ''
+            ) {
+                wrapper.remove();
+            }
+        });
+    });
+}
+
 // {PhotosetLayout} is a digit-per-row string: "221" means a row of two, a row
 // of two, then a row of one. Returns [] for anything malformed, which leaves
 // the photoset stacked rather than throwing.
@@ -192,6 +254,7 @@ if (typeof document !== 'undefined') {
     // grid. Photosets next, because they change post height and Masonry must
     // measure the final layout.
     removeSupersededReposts();
+    removeDuplicateTrailImages();
     layoutPhotosets();
     initLayout();
 }
@@ -202,6 +265,8 @@ if (typeof module !== 'undefined') {
         resolveLayout,
         getPostsToHide,
         getPhotosetRows,
+        getTumblrImageKey,
+        getDuplicateTrailImages,
         LAYOUT_STORAGE_KEY,
     };
 }
