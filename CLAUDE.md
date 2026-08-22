@@ -145,8 +145,16 @@ column. Narrative tags are listed in `NARRATIVE_TAGS` in `js/theme.js`; that lis
 - Vendor libraries are self-hosted in `js/vendor/` (downloaded from unpkg), never CDN-linked.
   Fonts and Material Icons are the deliberate exceptions.
 - CSS custom properties are lowercase and hyphenated: `--primary-bg-color`, `--muted-text-color`.
-- Keep `{block:X}` / `{/block:X}` balanced. Quick check:
-  `for tag in Posts IndexPage TagPage PermalinkPage; do echo "$tag $(grep -o "{block:$tag}" theme.html | wc -l)/$(grep -o "{/block:$tag}" theme.html | wc -l)"; done`
+- Keep `{block:X}` / `{/block:X}` balanced. Quick check — note the `[ }]`, which is what lets it
+  see parameterised openers like `{block:JumpPagination length="5"}`:
+  ```bash
+  for tag in Posts IndexPage TagPage PermalinkPage Pagination JumpPagination Date; do
+    o=$(grep -o "{block:$tag[ }]" theme.html | wc -l); c=$(grep -o "{/block:$tag}" theme.html | wc -l)
+    [ "$o" != "$c" ] && echo "MISMATCH $tag: $o/$c"
+  done; echo "balance ok"
+  ```
+  It counts text, not markup, so it also trips on tag names written inside HTML comments. Both
+  failure modes are false positives — confirm with `grep -n` before "fixing" anything.
 - Verify JS with `node --check js/theme.js` and `node js/theme.test.js` before committing.
 
 ## Reference themes
