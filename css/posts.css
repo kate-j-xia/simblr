@@ -133,7 +133,7 @@ article.posts .comment:first-of-type .user {
     /* 1px reads as a hairline against 12px Lora; the offset keeps it clear of
        descenders instead of striking through them. */
     text-decoration-thickness: 0.5px;
-    text-underline-offset: 2px;
+    text-underline-offset: 5px;
     text-decoration-color: var(--post-link-underline-color);
 }
 
