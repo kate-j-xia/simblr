@@ -71,7 +71,7 @@
 }
 
 .menu a,
-.layout-toggle {
+.pref-label {
     display: inline-block;
     font-size: .8em;
     letter-spacing: 2.5px;
@@ -82,10 +82,63 @@
     background: var(--primary-bg-color);
 }
 
-.layout-toggle {
-    padding-left: 0;
+/* -- reader preferences ---------------------------------------------------- */
+
+/* Settings rows, not navigation: each is a labelled on/off state rather than a
+   destination. The label is constant and the icon's FILL axis carries the
+   state, so a new setting is one more .pref-toggle with the same shape. */
+.prefs {
+    margin-top: 35px;
+}
+
+.pref-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 0;
     border: 0;
+    background: none;
     cursor: pointer;
+}
+
+/* Same dotted leader as .menu li, drawn behind the row; the label and icon
+   both carry the page background, which masks it at either end. */
+.pref-toggle:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: -1;
+    height: 0;
+    width: 100%;
+    border-bottom: 1px dotted var(--border-color);
+}
+
+.pref-toggle:hover .pref-label,
+.pref-toggle:hover .pref-icon {
+    color: var(--link-hover-color);
+}
+
+/* Google's own .material-symbols-outlined rule hardcodes font-size: 24px —
+   this must stay specific enough to beat it. */
+.prefs .pref-icon {
+    font-size: 1.25em;
+    line-height: 1;
+    padding-left: 10px;
+    color: var(--muted-text-color);
+    background: var(--primary-bg-color);
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' -25, 'opsz' 20;
+    transition: font-variation-settings .2s ease, color .3s linear;
+}
+
+/* The setting is on. Filling the same glyph rather than swapping icons is why
+   these are variable fonts. */
+.pref-toggle[aria-pressed="true"] .pref-icon {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' -25, 'opsz' 20;
+    color: var(--primary-text-color);
 }
 
 /* -- posts container ------------------------------------------------------ */

@@ -243,7 +243,9 @@ function initLayout() {
 
         if (toggle) {
             toggle.hidden = false;
-            toggle.textContent = layout === 'grid' ? 'list view' : 'grid view';
+            // The label is static and names the setting; state lives in
+            // aria-pressed, which CSS reads to fill the icon.
+            toggle.setAttribute('aria-pressed', layout === 'grid' ? 'true' : 'false');
         }
     }
 

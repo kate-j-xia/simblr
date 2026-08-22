@@ -71,6 +71,12 @@ won't show up in Tumblr.
   order; each step changes post height and Masonry must measure last. A sidebar toggle writes a
   grid/list override per bucket under
   `simblr-layout`. Masonry is initialized/destroyed as layout changes.
+- **`section.prefs` in the sidebar is the reader-settings group**, not navigation. Each row is a
+  `.pref-toggle` button: a constant `.pref-label` naming the setting, and a `.pref-icon` whose
+  `FILL` axis carries on/off, driven by `aria-pressed`. **Adding dark mode means copying one
+  button and writing its handler** — do not invent a second control shape for it, and do not go
+  back to labels that flip between states, or the two rows will look identical while meaning
+  different things.
 - **CSS is split by concern**, linked from `theme.html` in this order (tokens must be first):
   - `css/tokens.css` — `:root` custom properties. The only place to change palette or typeface.
   - `css/base.css` — reset, body typography, links, scrollbar. No layout, no components.
