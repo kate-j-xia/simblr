@@ -15,6 +15,13 @@
     --link-color: #f08dbd;
     --link-hover-color: #f08dbd;
 
+    /* Links written inside post copy — captions, text posts, reblog
+       commentary, asks, chat. These are underlined, because a link buried mid
+       paragraph cannot rely on colour alone to be found. Structural links
+       (username, date, tags) keep --link-color and stay undecorated. */
+    --post-link-color: #c2185b;
+    --post-link-hover-color: #f08dbd;
+
     /* The post button row is styled independently of links so the icons can
        read as controls rather than as more links. --icon-active-color is the
        liked state, which fills the glyph as well as recolouring it. */

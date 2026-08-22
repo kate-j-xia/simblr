@@ -115,6 +115,54 @@ article.posts .comment:first-of-type .user {
     padding-top: 25px;
 }
 
+/* -- links in post copy ---------------------------------------------------- */
+
+/* An allowlist, not a denylist: these four containers are where a reader's own
+   prose lives, so a link inside them is something they typed. Everything else
+   in a post — username, date, tags, title, the icon row — is structural and
+   keeps --link-color without an underline.
+   Listing the containers rather than excluding the structural links means a
+   new structural element added later is opted OUT by default, which is the
+   safe direction. */
+.comment a,
+.q a,
+.source a,
+.chat a {
+    color: var(--post-link-color);
+    text-decoration: underline;
+    /* 1px reads as a hairline against 12px Lora; the offset keeps it clear of
+       descenders instead of striking through them. */
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.comment a:hover,
+.q a:hover,
+.source a:hover,
+.chat a:hover {
+    color: var(--post-link-hover-color);
+}
+
+/* Carve-outs. Both sit inside the containers above but are labels, not prose:
+   .user is the reblog-trail username, .as the asker's name on an ask.
+   Colour has to be restated, not just the underline — `.comment a` is 0-1-1
+   and outranks the bare `.user` rule at 0-1-0, so without this the username
+   would quietly take the post-link colour. */
+.comment a.user {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+.comment a.user:hover {
+    color: var(--link-hover-color);
+}
+
+.q .as a,
+.q .as a:hover {
+    color: var(--primary-text-color);
+    text-decoration: none;
+}
+
 /* -- chat ------------------------------------------------------------ */
 
 ol.chat {

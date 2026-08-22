@@ -12,8 +12,10 @@ function img(w, h) {
 
 const POSTS = [
     `<div class="title">A text post with a title</div>
-     <li class="comment ted">Body copy for the text post. It should wrap across a
-     couple of lines so line-height and measure are visible.</li>`,
+     <li class="comment ted">Body copy for the text post, containing
+     <a href="#">an embedded link</a> so post-copy link styling is visible.
+     It should wrap across a couple of lines so line-height and measure are
+     visible.</li>`,
 
     `<div class="media"><div class="ph"><img src="${img(500, 700)}" alt=""></div></div>
      <li class="comment"><a href="#" class="user">someblog</a>A photo caption.</li>`,
@@ -40,7 +42,8 @@ const POSTS = [
     `<div class="quote title">A pull quote, set larger than body copy.</div>
      <div class="source">&mdash; someone</div>`,
 
-    `<div class="q"><span class="as">anon sent: </span>Do you take build requests?</div>
+    `<div class="q"><span class="as"><a href="#">anon</a> sent: </span>Do you take
+       build requests, or is <a href="#">this lot</a> off limits?</div>
      <li class="comment"><span class="user">kate replied: </span>Sometimes! Send me a lot size.</li>`,
 
     `<ol class="chat">
