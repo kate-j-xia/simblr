@@ -186,6 +186,21 @@ section.posts.is-loaded {
     transition: opacity .3s ease;
 }
 
+/* -- custom pages ---------------------------------------------------------- */
+
+/* The ask form is a cross-origin Tumblr iframe: its interior cannot be styled
+   from here, and it cannot report its own height, so the height is fixed.
+   Raise it if Tumblr's form grows a field. See pages/ask.html. */
+.ask-form {
+    display: block;
+    width: 100%;
+    height: 200px;
+    margin-top: 25px;
+    border: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
 /* -- responsive ------------------------------------------------------------ */
 
 @media (max-width: 700px) {

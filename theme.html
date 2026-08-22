@@ -26,7 +26,6 @@
         <meta name="text:Posts" content="500px">
         <meta name="text:Home link" content="">
         <meta name="text:Archive link" content="">
-        <meta name="text:Ask link" content="contact">
         <meta name="text:Link 1" content="">
         <meta name="text:Link 1 URL" content="">
         <meta name="text:Link 2" content="">
@@ -86,7 +85,8 @@
                 <nav class="menu">
                     {block:ifHomeLink}<li><a href="/">{text:home link}</a></li>{/block:ifHomeLink}
                     {block:ifArchiveLink}<li><a href="/archive">{text:archive link}</a></li>{/block:ifArchiveLink}
-                    {block:ifAskLink}<li><a href="/ask">{text:ask link}</a></li>{/block:ifAskLink}
+                    {block:AskEnabled}<li><a href="/ask">{AskLabel}</a></li>{/block:AskEnabled}
+                    {block:SubmissionsEnabled}<li><a href="/submit">{SubmitLabel}</a></li>{/block:SubmissionsEnabled}
                     {block:HasPages}{block:Pages}<li><a href="{URL}">{Label}</a></li> {/block:Pages}{/block:HasPages}
                     {block:ifLink1}<li><a href="{text:link 1 url}">{text:link 1}</a></li>{/block:ifLink1}
                     {block:ifLink2}<li><a href="{text:link 2 url}">{text:link 2}</a></li>{/block:ifLink2}
