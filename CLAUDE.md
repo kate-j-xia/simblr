@@ -18,11 +18,12 @@ step, no package manager, no framework. The only test runner is `node js/theme.t
    done; Tasks 7–9 (custom pages, doc refresh) are still open and unaffected by the newer plan.
 4. `work-docs/GETTING_STARTED.md` — background and dev loop. Its "Next steps" are stale.
 
-Working branch: `base-grid`. Main branch: `main`.
+Working branch: **`main`**. `base-grid` is fully merged into it and is now stale — check
+`git branch --show-current` rather than trusting this line.
 
-**Nothing is pushed.** `main` is ahead of `origin/main` and `base-grid` is ahead of `main`. CSS/JS
-changes only reach the blog after merging to `main` and pushing, so *nothing done since the last
-push is visible in Tumblr yet.* Pushing is the user's call.
+**Nothing is pushed.** `main` is ahead of `origin/main`. CSS/JS changes only reach the blog after
+pushing `main`, so *nothing done since the last push is visible in Tumblr yet.* Pushing is the
+user's call.
 
 ## Local preview
 
@@ -79,22 +80,33 @@ won't show up in Tumblr.
   order; each step changes post height and Masonry must measure last. A sidebar toggle writes a
   grid/list override per bucket under
   `simblr-layout`. Masonry is initialized/destroyed as layout changes.
+- **Dark mode lives in two places on purpose.** `resolveTheme()` in `js/theme.js` is the real
+  logic, but it is *duplicated* in an inline `<script>` in `theme.html`'s `<head>`. That copy has
+  to exist: `theme.js` is deferred, so it runs after first paint and the page would flash light
+  before going dark, and `{block:ifDarkDefault}` is a Tumblr tag that only substitutes inside
+  `theme.html`. The inline snippet resolves the theme, writes `data-theme` on `<html>`, and hands
+  the blog-level default to `theme.js` via `data-theme-default`. **Change one, change both.**
+  Precedence: reader's stored choice (`simblr-theme`) → blog "Dark default" option → OS
+  `prefers-color-scheme`.
 - **`section.prefs` in the sidebar is the reader-settings group**, not navigation. Each row is a
   `.pref-toggle` button: a constant `.pref-label` naming the setting, and a `.pref-icon` whose
-  `FILL` axis carries on/off, driven by `aria-pressed`. **Adding dark mode means copying one
-  button and writing its handler** — do not invent a second control shape for it, and do not go
-  back to labels that flip between states, or the two rows will look identical while meaning
-  different things.
+  `FILL` axis carries on/off, driven by `aria-pressed`. There are two rows — `.layout-toggle` and
+  `.theme-toggle` — and **a third setting is one more copied button plus a handler**. Do not
+  invent a second control shape for it, and do not go back to labels that flip between states, or
+  the rows will look identical while meaning different things. Only `.layout-toggle` is wrapped in
+  `{block:IndexPage}`: a permalink has no grid to switch to, but it *is* where an external link
+  lands, so dark mode has to be reachable there.
 - **CSS is split by concern**, linked from `theme.html` in this order (tokens must be first):
   - `css/tokens.css` — `:root` custom properties. The only place to change palette or typeface.
   - `css/base.css` — reset, body typography, links, scrollbar. No layout, no components.
   - `css/layout.css` — sidebars, posts container and rail, Masonry grid, pagination, responsive.
   - `css/posts.css` — post-card internals (titles, media, photoset rows, trail, tags, `.when`,
     asks, chat, notes).
-  - `css/dark.css` — no rules yet. Dark mode should only need to override tokens. **Scope them
-    `:root[data-theme="dark"]`**, not a bare `[data-theme="dark"]`: the latter ties with the
-    customizer block in `theme.html` at 0-1-0 and loses on document order, so dark mode renders
-    light with no error. Verified — the bare selector genuinely fails. The file explains this.
+  - `css/dark.css` — token overrides only, under `:root[data-theme="dark"]`. **Never a bare
+    `[data-theme="dark"]`**: it ties with the customizer block in `theme.html` at 0-1-0 and loses
+    on document order, so dark mode renders light with no error. Verified — the bare selector
+    genuinely fails. If a dark rule needs a selector other than `:root[data-theme="dark"]`, the
+    colour it wants is missing from `tokens.css` and belongs there.
 - **`dev/preview.html`** — local harness. Never linked from `theme.html`.
 
 Layout defaults: home → grid, catalog tag → grid, narrative tag → one column, permalink → one
