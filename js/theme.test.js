@@ -6,6 +6,7 @@ const {
     getPhotosetRows,
     getTumblrImageKey,
     getDuplicateTrailImages,
+    resolveTheme,
 } = require('./theme.js');
 
 const NARRATIVE = ['ts2-legacies', 'ts3-legacies'];
@@ -189,3 +190,31 @@ assert.strictEqual(
 );
 
 console.log('legacy image key tests passed');
+
+// -- theme resolution -------------------------------------------------------
+
+// With nothing stored and no blog default, the system preference decides.
+assert.strictEqual(resolveTheme(null, true, ''), 'dark');
+assert.strictEqual(resolveTheme(null, false, ''), 'light');
+
+// A stored choice always wins — over the system and over the blog default.
+assert.strictEqual(resolveTheme('light', true, ''), 'light');
+assert.strictEqual(resolveTheme('dark', false, ''), 'dark');
+assert.strictEqual(resolveTheme('light', true, 'dark'), 'light');
+
+// The blog's "Dark default" option outranks the system preference, but only
+// while the reader has not made a choice of their own.
+assert.strictEqual(resolveTheme(null, false, 'dark'), 'dark');
+assert.strictEqual(resolveTheme(null, true, 'dark'), 'dark');
+
+// Anything else stored is not a choice — fall back rather than trusting a junk
+// value onto <html>.
+assert.strictEqual(resolveTheme('', true, ''), 'dark');
+assert.strictEqual(resolveTheme('sepia', false, ''), 'light');
+assert.strictEqual(resolveTheme(undefined, true, ''), 'dark');
+
+// A missing blog default (the attribute absent entirely) must behave as unset,
+// not as truthy.
+assert.strictEqual(resolveTheme(null, false, undefined), 'light');
+
+console.log('theme tests passed');

@@ -1,4 +1,5 @@
 const LAYOUT_STORAGE_KEY = 'simblr-layout';
+const THEME_STORAGE_KEY = 'simblr-theme';
 
 // Tags whose pages default to a single column. These set the *default* only —
 // the reader can always toggle, and an unlisted tag just defaults to grid.
@@ -44,6 +45,82 @@ function writeStoredLayout(bucket, layout) {
         localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(stored));
     } catch (e) {
         /* private browsing — preference just won't persist */
+    }
+}
+
+// Precedence: the reader's stored choice, then the blog-level "Dark default"
+// customizer option, then the operating system. The blog default outranks the
+// OS because it is the owner's stated design intent for a first-time visitor;
+// anyone who disagrees clicks the toggle once and their choice is stored, which
+// then outranks both.
+//
+// Kept pure and separate from the DOM because the same rule runs twice: here,
+// and in the inline <head> snippet in theme.html that applies the theme before
+// first paint. If you change this, change that snippet too.
+function resolveTheme(stored, prefersDark, blogDefault) {
+    if (stored === 'dark' || stored === 'light') return stored;
+    if (blogDefault === 'dark') return 'dark';
+    return prefersDark ? 'dark' : 'light';
+}
+
+function readStoredTheme() {
+    try {
+        return localStorage.getItem(THEME_STORAGE_KEY);
+    } catch (e) {
+        return null;
+    }
+}
+
+function writeStoredTheme(theme) {
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (e) {
+        /* private browsing — preference just won't persist */
+    }
+}
+
+function initTheme() {
+    const root = document.documentElement;
+    const toggle = document.querySelector('.theme-toggle');
+    const media = window.matchMedia
+        ? window.matchMedia('(prefers-color-scheme: dark)')
+        : null;
+
+    function applyTheme(theme) {
+        root.dataset.theme = theme;
+        if (toggle) {
+            toggle.hidden = false;
+            // Label is static and names the setting; state lives in
+            // aria-pressed, which CSS reads to fill the icon.
+            toggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+        }
+    }
+
+    // The inline <head> snippet already applied the theme; re-resolving here
+    // keeps the two in step and wires up the button once the DOM exists.
+    applyTheme(resolveTheme(
+        readStoredTheme(),
+        media ? media.matches : false,
+        root.dataset.themeDefault
+    ));
+
+    if (toggle) {
+        toggle.addEventListener('click', function () {
+            const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+            writeStoredTheme(next);
+            applyTheme(next);
+        });
+    }
+
+    // Follow the OS while the reader has expressed no preference of their own.
+    // Once they have clicked the toggle, their choice is stored and this stops
+    // overriding it.
+    if (media && media.addEventListener) {
+        media.addEventListener('change', function (e) {
+            if (readStoredTheme()) return;
+            if (root.dataset.themeDefault === 'dark') return;
+            applyTheme(e.matches ? 'dark' : 'light');
+        });
     }
 }
 
@@ -265,6 +342,9 @@ if (typeof document !== 'undefined') {
     // anything removed afterwards leaves a stale reference and a hole in the
     // grid. Photosets next, because they change post height and Masonry must
     // measure the final layout.
+    // Theme first, and independent of the rest: it only sets an attribute on
+    // <html>, and it must still run on pages that have no feed to lay out.
+    initTheme();
     removeSupersededReposts();
     removeDuplicateTrailImages();
     layoutPhotosets();
@@ -279,6 +359,8 @@ if (typeof module !== 'undefined') {
         getPhotosetRows,
         getTumblrImageKey,
         getDuplicateTrailImages,
+        resolveTheme,
         LAYOUT_STORAGE_KEY,
+        THEME_STORAGE_KEY,
     };
 }

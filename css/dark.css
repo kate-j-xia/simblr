@@ -1,41 +1,54 @@
-/* Dark mode. Not implemented yet — this file is intentionally rule-free.
+/* Dark mode. Token overrides only — no layout, no components.
 
-   Dark mode should need nothing but token overrides. Everything in base.css,
-   layout.css, and posts.css already reads its colours from the custom
-   properties in tokens.css, so redefining those here re-themes the whole page.
+   Everything in base.css, layout.css, and posts.css reads its colours from the
+   custom properties in tokens.css, so redefining those here re-themes the whole
+   page. If you find yourself writing a rule with a selector other than
+   :root[data-theme="dark"], the colour it needs is probably missing from
+   tokens.css and belongs there instead.
 
-   READ THIS BEFORE ADDING RULES
-   -----------------------------
+   WHY :root[data-theme="dark"] AND NOT [data-theme="dark"]
+   --------------------------------------------------------
    theme.html carries an inline <style> block that feeds Tumblr's Customize
    panel into the same :root tokens. That block is a real competitor in the
    cascade, and it has the same 0-1-0 specificity as a bare :root or
    [data-theme="dark"] selector.
 
-   So scope dark rules with :root[data-theme="dark"] (0-2-0). That outranks the
-   customizer block no matter where it sits in the document. A bare
-   [data-theme="dark"] only wins by document order, which is a silent
-   dependency on theme.html's <head> staying in its current order — and the
-   failure mode is a dark palette that mysteriously renders light.
+   :root[data-theme="dark"] is 0-2-0, so it outranks the customizer block no
+   matter where it sits in the document. A bare [data-theme="dark"] only wins by
+   document order, which is a silent dependency on theme.html's <head> staying
+   in its current order — and the failure mode is a dark palette that
+   mysteriously renders light.
 
-   Sketch:
+   The attribute is set on <html> by an inline script in theme.html's <head>,
+   before first paint, so there is no flash of light before dark loads. */
 
-       :root[data-theme="dark"] {
-           --primary-bg-color: #111111;
-           --primary-text-color: #eeeeee;
-           --title-color: #ffffff;
-           --blog-title-color: #ffffff;
-           --border-color: #262626;
-           --text-border-color: #333333;
-           --scrollbar-color: #444444;
-       }
+:root[data-theme="dark"] {
+    /* Not pure black. #000 against 12px Lora produces enough halation to make
+       the serifs shimmer; a near-black lifted slightly toward the theme's pink
+       keeps the two palettes recognisably the same design. */
+    --primary-bg-color: #16151a;
+    --primary-text-color: #e8e6ea;
+    --title-color: #ffffff;
+    --blog-title-color: #ffffff;
 
-   --muted-text-color and --quiet-text-color derive from --primary-text-color
-   through color-mix, so they follow automatically. Do not restate them.
+    /* Borders carry most of this theme's structure — the rail, the dotted
+       leaders, the .when divider. On dark they have to be lifted well clear of
+       the background or the layout loses its skeleton, but stay under the text
+       or they start competing with it. */
+    --border-color: #2b2933;
+    --text-border-color: #38353f;
+    --scrollbar-color: #4a4653;
 
-   The toggle itself belongs in section.prefs in the sidebar: copy the existing
-   .pref-toggle button and give it a handler. See the note in CLAUDE.md — the
-   label must stay static, with state carried by aria-pressed and the icon's
-   FILL axis, or the two rows will look identical while meaning different
-   things. Persist the choice alongside the layout preference and default from
-   prefers-color-scheme.
-*/
+    /* #c2185b (the light-mode post link) is a dark crimson that all but
+       disappears on this background, so it inverts to a tint rather than a
+       shade. The structural --link-color is already light enough to keep. */
+    --post-link-color: #f4a8c8;
+    --post-link-hover-color: #fbd0e2;
+    --post-link-underline-color: #b86d92;
+    --link-hover-color: #fbd0e2;
+    --icon-hover-color: #fbd0e2;
+
+    /* --muted-text-color, --quiet-text-color and --icon-color all derive from
+       --primary-text-color via color-mix, so they follow the line above
+       automatically. Do not restate them here. */
+}
