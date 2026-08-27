@@ -27,12 +27,32 @@
         <meta name="color:Link hover" content="#f08dbd">
         <meta name="color:Post link" content="#c2185b">
         <meta name="color:Post link hover" content="#f08dbd">
-        <meta name="color:Post link underline" content="#f08dbd">
         <meta name="color:Post link underline" content="#c2185b">
         <meta name="color:Borders" content="#f5f5f5">
         <meta name="color:Icon" content="#6b6b6b">
         <meta name="color:Icon hover" content="#f08dbd">
         <meta name="color:Icon fill" content="#f08dbd">
+
+        <!-- Dark palette. A full parallel set, because dark mode is not a filter
+             over the light one — every colour needs its own value. These feed a
+             SECOND inline <style> below, placed after dark.css.
+
+             Every light field above needs a partner here. A missing one is not
+             inert: the light value simply survives into dark mode. That is how
+             dark mode shipped with #6b6b6b icons on a near-black background. -->
+        <meta name="color:Dark background" content="#16151a">
+        <meta name="color:Dark text" content="#e8e6ea">
+        <meta name="color:Dark title" content="#ffffff">
+        <meta name="color:Dark blog title" content="#ffffff">
+        <meta name="color:Dark link" content="#f08dbd">
+        <meta name="color:Dark link hover" content="#fbd0e2">
+        <meta name="color:Dark post link" content="#f4a8c8">
+        <meta name="color:Dark post link hover" content="#fbd0e2">
+        <meta name="color:Dark post link underline" content="#b86d92">
+        <meta name="color:Dark borders" content="#2b2933">
+        <meta name="color:Dark icon" content="#9c98a6">
+        <meta name="color:Dark icon hover" content="#fbd0e2">
+        <meta name="color:Dark icon fill" content="#f4a8c8">
         <meta name="select:Font size" content="9px" title="9px">
         <meta name="select:Font size" content="10px" title="10px">
         <meta name="select:Font size" content="11px" title="11px">
@@ -85,7 +105,6 @@
                 --post-link-color: {color:Post link};
                 --post-link-hover-color: {color:Post link hover};
                 --post-link-underline-color: {color:Post link underline};
-                --post-link-underline-color: {color:Post link underline};
                 --border-color: {color:Borders};
                 --icon-color: {color:Icon};
                 --icon-hover-color: {color:Icon hover};
@@ -97,6 +116,36 @@
         <link href="https://kate-j-xia.github.io/simblr/css/layout.css" rel="stylesheet">
         <link href="https://kate-j-xia.github.io/simblr/css/posts.css" rel="stylesheet">
         <link href="https://kate-j-xia.github.io/simblr/css/dark.css" rel="stylesheet">
+
+        <!-- The dark half of the customizer bridge, and the mirror image of the
+             block above: it must sit AFTER dark.css, not before.
+
+             dark.css scopes its palette to :root[data-theme="dark"] (0-2-0), and
+             so does this. At equal specificity document order decides, so a
+             block placed before dark.css would lose and the Customize panel's
+             dark fields would silently do nothing.
+
+             dark.css therefore holds the defaults — what dev/preview.html and
+             any non-Tumblr context see — and these values override them on the
+             live blog. Keep the two in step: the meta defaults above are copied
+             from dark.css. -->
+        <style>
+            :root[data-theme="dark"] {
+                --primary-bg-color: {color:Dark background};
+                --primary-text-color: {color:Dark text};
+                --title-color: {color:Dark title};
+                --blog-title-color: {color:Dark blog title};
+                --link-color: {color:Dark link};
+                --link-hover-color: {color:Dark link hover};
+                --post-link-color: {color:Dark post link};
+                --post-link-hover-color: {color:Dark post link hover};
+                --post-link-underline-color: {color:Dark post link underline};
+                --border-color: {color:Dark borders};
+                --icon-color: {color:Dark icon};
+                --icon-hover-color: {color:Dark icon hover};
+                --icon-active-color: {color:Dark icon fill};
+            }
+        </style>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,200..700,0..1,-25" rel="stylesheet">
 
         <!-- Sets the theme before first paint, so the page never flashes light

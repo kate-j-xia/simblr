@@ -46,9 +46,18 @@
     --post-link-hover-color: #fbd0e2;
     --post-link-underline-color: #b86d92;
     --link-hover-color: #fbd0e2;
-    --icon-hover-color: #fbd0e2;
 
-    /* --muted-text-color, --quiet-text-color and --icon-color all derive from
-       --primary-text-color via color-mix, so they follow the line above
-       automatically. Do not restate them here. */
+    /* --icon-color cannot be left to derive. tokens.css does derive it from
+       --primary-text-color, but the customizer bridge in theme.html assigns it
+       an explicit light value at :root, which then survives into dark mode
+       because nothing here outranks it — that shipped once as #6b6b6b icons on
+       this background. Any token the bridge sets explicitly must be restated
+       here, derived or not. */
+    --icon-color: #9c98a6;
+    --icon-hover-color: #fbd0e2;
+    --icon-active-color: #f4a8c8;
+
+    /* --muted-text-color and --quiet-text-color are the exception: the bridge
+       does not set them, so their color-mix derivation from --primary-text-color
+       survives and they follow the text colour above automatically. */
 }
