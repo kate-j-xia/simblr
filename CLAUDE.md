@@ -55,13 +55,40 @@ served raw from GitHub Pages. A `{select:font size}` in a stylesheet is dead tex
 `ref*.html` uses that syntax heavily; every one must become a `:root` token when ported. Check with:
 `grep -n '{[a-zA-Z]*:' css/*.css`
 
-**The one exception — the customizer bridge.** `theme.html` carries a single inline `<style>` block
-that assigns `{color:...}` values to the `:root` tokens. It is the *only* place Tumblr's Customize
-panel can reach the token system, precisely because `theme.html` is the only templated file. It
-must stay **after `tokens.css`** (to override defaults) and **before `dark.css`** (so a dark palette
-still wins). Adding a colour means editing both the `<meta name="color:...">` list and that block,
-then re-pasting `theme.html` — a palette tweak to an *existing* field needs neither a push nor a
-re-paste.
+**There are TWO customizer bridges, light and dark.** The light one sets `:root` and sits after
+`tokens.css` / before `dark.css`. The dark one sets `:root[data-theme="dark"]` and must sit
+**after `dark.css`** — both are 0-2-0 against it, so document order is the only thing deciding, and
+a dark bridge placed earlier silently does nothing. `dark.css` holds the defaults that
+`dev/preview.html` and any non-Tumblr context see; the bridge overrides them on the live blog, so
+the `<meta content="...">` defaults must be kept equal to the values in `dark.css`.
+
+**Every token the light bridge sets explicitly must be restated in `dark.css`,** derived or not.
+`tokens.css` derives `--icon-color` from `--primary-text-color` via `color-mix`, but the light
+bridge assigns it a literal, which then outranks the derivation and survives into dark mode.
+That shipped once as `#6b6b6b` icons on `#16151a` — 3.41:1. Only `--muted-text-color` and
+`--quiet-text-color` are safe to leave derived, because no bridge touches them. Check parity with:
+```bash
+python3 - <<'PY'
+import re
+src=open('theme.html').read()
+n=[m.group(1) for m in re.finditer(r'name="color:([^"]+)"', src)]
+light=[x for x in n if not x.lower().startswith('dark')]
+dark=[x[5:].strip().lower() for x in n if x.lower().startswith('dark')]
+print("no dark partner:", [x for x in light if x.lower() not in dark] or "none")
+PY
+```
+
+**Why they exist at all:** the bridges assign `{color:...}` values to the `:root` tokens, and they
+are the *only* place Tumblr's Customize panel can reach the token system, precisely because
+`theme.html` is the only templated file.
+
+**Adding a colour** means editing three things — the `<meta name="color:...">` list, the light
+bridge, *and* the dark bridge — then re-pasting `theme.html`. A tweak to an *existing* field's
+value in the Customize panel needs neither a push nor a re-paste. Verify nothing is orphaned:
+```bash
+diff <(grep -o 'name="color:[^"]*"' theme.html | sed 's/name="color://;s/"//' | sort) \
+     <(sed -n '/<style>/,/<\/style>/p' theme.html | grep -o '{color:[^}]*}' | sed 's/{color://;s/}//' | sort)
+```
 
 **Hosting:** GitHub Pages is live at `https://kate-j-xia.github.io/simblr/`, serving `main` at
 root. Linked CSS/JS changes only reach the blog after merging to `main` — feature-branch work
