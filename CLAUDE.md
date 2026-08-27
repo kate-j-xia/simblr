@@ -121,6 +121,12 @@ column. Narrative tags are listed in `NARRATIVE_TAGS` in `js/theme.js`; that lis
   `containerWidth / (colSizer + gutter)`. A `50%` sizer plus a gutter overflows and silently
   collapses the grid to one column with no error. `.grid__col-sizer` and `.grid__item` are both
   `calc(50% - 20px)` — change them together.
+- **`hidden` loses to any author `display` rule.** `.pref-toggle` sets `display: flex`, which is
+  author-origin and so beats the UA stylesheet's `[hidden] { display: none }` outright — specificity
+  never enters into it. `layout.css` carries an explicit `.pref-toggle[hidden] { display: none }`
+  to restore it. Without that the toggles stay visible when `theme.js` fails to load, which makes a
+  total script failure look like a broken click handler. Any new JS-revealed control needs the same
+  rule.
 - **The feed is `opacity: 0` until JS adds `.is-loaded`.** A `reveal-failsafe` keyframe reveals it
   after 3s so a failed `theme.js` request can't leave the blog permanently blank. Keep that
   failsafe if you touch the reveal logic.
@@ -168,8 +174,33 @@ column. Narrative tags are listed in `NARRATIVE_TAGS` in `js/theme.js`; that lis
   ```
   The `${tag}` braces are required: this shell is zsh, where a bare `$tag[...]` parses as array
   subscripting and the loop dies with "bad math expression" while still printing `balance ok`.
-  It counts text, not markup, so it also trips on tag names written inside HTML comments. Both
-  failure modes are false positives — confirm with `grep -n` before "fixing" anything.
+
+  Add every `if:` option you use to that tag list — the default list above does not cover them.
+- **Never write a block tag inside an HTML comment.** Tumblr substitutes template tags across the
+  raw text of `theme.html` and has no concept of comments, so an opener written in prose is a
+  *real* opener and pairs with the next real closer. This has already broken the theme once: a
+  comment explaining `ifDarkDefault` (written with braces) paired with the closer in the script
+  below it, and when the option was off Tumblr deleted the span between them — which contained the
+  comment's `-->` and the `<script>` open tag. The comment ran on and swallowed all three script
+  tags, so no JavaScript loaded at all and both sidebar toggles rendered inert.
+
+  A mismatch reported by the check above **is not a false positive just because the extra tag is
+  in a comment** — that is exactly the bug. Name tags without braces in prose (`ifDarkDefault`,
+  not `{block:ifDarkDefault}`). To confirm a suspected break, simulate the substitution and parse
+  the result rather than eyeballing it:
+  ```bash
+  python3 - <<'PY'
+  from html.parser import HTMLParser
+  src = open('theme.html').read()
+  o = src.index('{block:ifDarkDefault}'); c = src.index('{/block:ifDarkDefault}')
+  rendered = src[:o] + src[c+len('{/block:ifDarkDefault}'):]   # option OFF
+  class P(HTMLParser):
+      def __init__(s): super().__init__(); s.n=0
+      def handle_starttag(s,t,a):
+          if t=='script': s.n+=1
+  p=P(); p.feed(rendered); print('script tags surviving:', p.n)   # expect 4
+  PY
+  ```
 - Verify JS with `node --check js/theme.js` and `node js/theme.test.js` before committing.
 - **Check that every `var(--x)` resolves.** A misspelled custom property does not error — it falls
   back to the initial value, so the rule appears to do nothing for no visible reason. This caught a
