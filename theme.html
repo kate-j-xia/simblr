@@ -188,20 +188,22 @@
                      Both start hidden and are revealed by theme.js, so a reader
                      with no JS never sees a control that cannot do anything. -->
 
-                <!-- Layout is index-only: a permalink is a single post, so there
-                     is no grid to switch to. Dark mode is not wrapped, because a
-                     permalink is exactly where an external link lands. -->
+                <!-- Dark mode is unwrapped and comes first: it applies on every
+                     page, including permalinks, which is where an external link
+                     lands. Layout is index-only below it — a permalink is a
+                     single post, so there is no grid to switch to, and on those
+                     pages dark mode is the only row. -->
+                <button type="button" class="pref-toggle theme-toggle" aria-pressed="false" hidden>
+                    <span class="pref-label">dark mode</span>
+                    <span class="material-symbols-outlined pref-icon">moon_stars</span>
+                </button>
+
                 {block:IndexPage}
                 <button type="button" class="pref-toggle layout-toggle" aria-pressed="false" hidden>
                     <span class="pref-label">grid view</span>
                     <span class="material-symbols-outlined pref-icon">space_dashboard</span>
                 </button>
                 {/block:IndexPage}
-
-                <button type="button" class="pref-toggle theme-toggle" aria-pressed="false" hidden>
-                    <span class="pref-label">dark mode</span>
-                    <span class="material-symbols-outlined pref-icon">moon_stars</span>
-                </button>
             </section>
         </aside>
 
