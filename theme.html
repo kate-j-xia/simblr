@@ -103,10 +103,17 @@
              on its way to dark. This has to be inline and blocking: theme.js is
              deferred, which means it runs after the first paint.
 
-             It is also the only place the blog-level default can be read —
-             {block:ifDarkDefault} is a Tumblr tag, and Tumblr only substitutes
-             those in theme.html, never in an external .js file. The resolved
-             default is handed to theme.js via data-theme-default.
+             It is also the only place the blog-level default can be read, since
+             Tumblr only substitutes template tags in theme.html and never in an
+             external .js file. The resolved default reaches theme.js via the
+             data-theme-default attribute.
+
+             NEVER write a block tag in a comment, here or anywhere in this file.
+             Tumblr substitutes tags across the raw text and does not know what
+             an HTML comment is, so an opener written in prose pairs with the
+             real closer below. That once deleted this comment's terminator and
+             the script's opening tag, leaving a runaway comment that swallowed
+             every script tag in the head. Name such tags without their braces.
 
              Mirrors resolveTheme() in js/theme.js. Change one, change both. -->
         <script>

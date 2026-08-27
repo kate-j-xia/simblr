@@ -129,6 +129,16 @@
     appearance: none;
 }
 
+/* theme.js unhides these once it has wired them up, so a reader without JS
+   never sees a control that cannot do anything. This rule is what makes that
+   work: `display: flex` above is author-origin and so beats the UA stylesheet's
+   [hidden] { display: none } outright, no matter how specific. Without an
+   explicit rule here the hidden attribute is inert, and a theme whose scripts
+   failed to load still shows both toggles — looking fine and doing nothing. */
+.pref-toggle[hidden] {
+    display: none;
+}
+
 /* Keyboard focus needs to stay visible, but the UA ring sits awkwardly on a
    full-width row, so mark the label rather than the whole button. */
 .pref-toggle:focus {
